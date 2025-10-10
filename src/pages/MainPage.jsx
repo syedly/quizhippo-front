@@ -1,22 +1,20 @@
-// src/pages/MainPage.jsx
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import Sidebar from "../components/Sidebar";
 
 export default function MainPage() {
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const token = localStorage.getItem("access");
-    if (!token) {
-      navigate("/");
-    }
-  }, [navigate]);
-
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900">
-      <p className="text-2xl font-bold text-gray-800 dark:text-white">
-        You are logged in ✅
-      </p>
+    <div className="flex min-h-screen bg-gray-100 dark:bg-gray-900">
+      {/* Sidebar */}
+      <Sidebar />
+
+      {/* Main Content */}
+      <div className="flex-1 p-10">
+        <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-4">
+          Welcome 👋
+        </h1>
+        <p className="text-lg text-gray-600 dark:text-gray-300">
+          You are logged in successfully.
+        </p>
+      </div>
     </div>
   );
 }

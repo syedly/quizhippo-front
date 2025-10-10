@@ -18,6 +18,12 @@ export default function IndexPage() {
         >
           Go to Login
         </button>
+        <button
+          onClick={() => navigate("/signup")}
+          className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition duration-200 font-medium"
+        >
+          Go to signup
+        </button>
       </div>
     </div>
   );

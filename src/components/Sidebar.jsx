@@ -1,70 +1,238 @@
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 export default function Sidebar() {
-  const navigate = useNavigate();
-
-  const handleLogout = async () => {
-    const refreshToken = localStorage.getItem("refresh");
-
-    try {
-      const response = await fetch("http://127.0.0.1:8000/api/logout-view/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ refresh: refreshToken }),
-      });
-
-      // Whether successful or not, clear local storage
-      localStorage.removeItem("access");
-      localStorage.removeItem("refresh");
-
-      if (response.ok) {
-        navigate("/login");
-      } else {
-        console.warn("Logout failed, but tokens cleared");
-        navigate("/login");
-      }
-    } catch (error) {
-      console.error("Logout error:", error);
-      navigate("/login");
+  const styles = {
+    sidebar: {
+      width: '256px',
+      backgroundColor: '#0f172a',
+      borderRight: '1px solid #1e293b',
+      display: 'flex',
+      flexDirection: 'column',
+      height: '100vh',
+      position: 'fixed',
+      left: 0,
+      top: 0
+    },
+    header: {
+      padding: '24px'
+    },
+    logo: {
+      fontSize: '20px',
+      fontWeight: 'bold',
+      color: '#ffffff'
+    },
+    nav: {
+      flex: 1,
+      padding: '0 12px'
+    },
+    navButton: {
+      width: '100%',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '12px',
+      padding: '12px 16px',
+      borderRadius: '8px',
+      background: 'none',
+      border: 'none',
+      cursor: 'pointer',
+      fontSize: '16px',
+      marginBottom: '8px',
+      transition: 'background-color 0.2s'
+    },
+    navButtonActive: {
+      backgroundColor: '#4f46e5',
+      color: '#ffffff'
+    },
+    navButtonInactive: {
+      color: '#94a3b8'
+    },
+    footer: {
+      padding: '12px',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '8px'
+    },
+    newQuizButton: {
+      width: '100%',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: '8px',
+      padding: '12px 16px',
+      borderRadius: '8px',
+      backgroundColor: '#4f46e5',
+      color: '#ffffff',
+      fontWeight: '500',
+      border: 'none',
+      cursor: 'pointer',
+      transition: 'background-color 0.2s'
+    },
+    logoutButton: {
+      width: '100%',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: '8px',
+      padding: '12px 16px',
+      borderRadius: '8px',
+      backgroundColor: '#dc2626',
+      color: '#ffffff',
+      fontWeight: '500',
+      border: 'none',
+      cursor: 'pointer',
+      transition: 'background-color 0.2s'
     }
   };
 
+  const [activeNav, setActiveNav] = useState('home');
+
   return (
-    <div className="flex flex-col h-screen w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-sm">
-      {/* Sidebar Header */}
-      <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-        <h2 className="text-2xl font-bold text-gray-800 dark:text-white">QuizHippo</h2>
+    <div style={styles.sidebar}>
+      {/* Header */}
+      <div style={styles.header}>
+        <h1 style={styles.logo}>Quiz Hippo</h1>
       </div>
 
-      {/* Sidebar Links */}
-      <div className="flex-1 p-4 space-y-4">
+      {/* Navigation */}
+      <nav style={styles.nav}>
         <button
-          onClick={() => navigate("/main")}
-          className="w-full text-left p-3 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 font-medium"
+          onClick={() => setActiveNav('home')}
+          style={{
+            ...styles.navButton,
+            ...(activeNav === 'home' ? styles.navButtonActive : styles.navButtonInactive)
+          }}
+          onMouseEnter={(e) => {
+            if (activeNav !== 'home') e.target.style.backgroundColor = '#1e293b';
+          }}
+          onMouseLeave={(e) => {
+            if (activeNav !== 'home') e.target.style.backgroundColor = 'transparent';
+          }}
         >
-          Dashboard
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
+          <span>Home</span>
         </button>
-        <button
-          onClick={() => navigate("/quizzes")}
-          className="w-full text-left p-3 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 font-medium"
-        >
-          My Quizzes
-        </button>
-        <button
-          onClick={() => navigate("/profile")}
-          className="w-full text-left p-3 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 font-medium"
-        >
-          Profile
-        </button>
-      </div>
 
-      {/* Logout Button at Bottom */}
-      <div className="p-4 border-t border-gray-200 dark:border-gray-700">
         <button
-          onClick={handleLogout}
-          className="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-md font-medium transition"
+          onClick={() => setActiveNav('profile')}
+          style={{
+            ...styles.navButton,
+            ...(activeNav === 'profile' ? styles.navButtonActive : styles.navButtonInactive)
+          }}
+          onMouseEnter={(e) => {
+            if (activeNav !== 'profile') e.target.style.backgroundColor = '#1e293b';
+          }}
+          onMouseLeave={(e) => {
+            if (activeNav !== 'profile') e.target.style.backgroundColor = 'transparent';
+          }}
         >
-          Logout
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+          <span>Profile</span>
+        </button>
+
+        <button
+          onClick={() => setActiveNav('quizzes')}
+          style={{
+            ...styles.navButton,
+            ...(activeNav === 'quizzes' ? styles.navButtonActive : styles.navButtonInactive)
+          }}
+          onMouseEnter={(e) => {
+            if (activeNav !== 'quizzes') e.target.style.backgroundColor = '#1e293b';
+          }}
+          onMouseLeave={(e) => {
+            if (activeNav !== 'quizzes') e.target.style.backgroundColor = 'transparent';
+          }}
+        >
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <span>My Quizzes</span>
+        </button>
+
+        <button
+          onClick={() => setActiveNav('explore')}
+          style={{
+            ...styles.navButton,
+            ...(activeNav === 'explore' ? styles.navButtonActive : styles.navButtonInactive)
+          }}
+          onMouseEnter={(e) => {
+            if (activeNav !== 'explore') e.target.style.backgroundColor = '#1e293b';
+          }}
+          onMouseLeave={(e) => {
+            if (activeNav !== 'explore') e.target.style.backgroundColor = 'transparent';
+          }}
+        >
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+          </svg>
+          <span>Explore</span>
+        </button>
+
+        <button
+          onClick={() => setActiveNav('server')}
+          style={{
+            ...styles.navButton,
+            ...(activeNav === 'server' ? styles.navButtonActive : styles.navButtonInactive)
+          }}
+          onMouseEnter={(e) => {
+            if (activeNav !== 'server') e.target.style.backgroundColor = '#1e293b';
+          }}
+          onMouseLeave={(e) => {
+            if (activeNav !== 'server') e.target.style.backgroundColor = 'transparent';
+          }}
+        >
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" />
+          </svg>
+          <span>Server</span>
+        </button>
+
+        <button
+          onClick={() => setActiveNav('settings')}
+          style={{
+            ...styles.navButton,
+            ...(activeNav === 'settings' ? styles.navButtonActive : styles.navButtonInactive)
+          }}
+          onMouseEnter={(e) => {
+            if (activeNav !== 'settings') e.target.style.backgroundColor = '#1e293b';
+          }}
+          onMouseLeave={(e) => {
+            if (activeNav !== 'settings') e.target.style.backgroundColor = 'transparent';
+          }}
+        >
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          <span>Settings</span>
+        </button>
+      </nav>
+
+      {/* Footer Buttons */}
+      <div style={styles.footer}>
+        <button
+          style={styles.newQuizButton}
+          onMouseEnter={(e) => e.target.style.backgroundColor = '#4338ca'}
+          onMouseLeave={(e) => e.target.style.backgroundColor = '#4f46e5'}
+        >
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>New Quiz</span>
+        </button>
+
+        <button
+          style={styles.logoutButton}
+          onMouseEnter={(e) => e.target.style.backgroundColor = '#b91c1c'}
+          onMouseLeave={(e) => e.target.style.backgroundColor = '#dc2626'}
+        >
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          <span>Logout</span>
         </button>
       </div>
     </div>

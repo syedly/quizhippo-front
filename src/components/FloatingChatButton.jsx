@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "../css/FloatingChatButton.css";
+import axios from "axios";
 
 export default function FloatingChatButton() {
   const [isOpen, setIsOpen] = useState(false);
@@ -7,30 +8,52 @@ export default function FloatingChatButton() {
     { id: 1, text: "Hi! 👋 How can I help you today?", sender: "bot", time: "12:00 PM" },
   ]);
   const [inputValue, setInputValue] = useState("");
+  const [isTyping, setIsTyping] = useState(false); // shows "bot is typing..." while waiting
 
   const toggleChat = () => setIsOpen(!isOpen);
 
-  const handleSendMessage = () => {
-    if (inputValue.trim()) {
-      const newMessage = {
-        id: messages.length + 1,
-        text: inputValue,
-        sender: "user",
+  const handleSendMessage = async () => {
+    if (!inputValue.trim()) return;
+
+    const userMessage = {
+      id: messages.length + 1,
+      text: inputValue,
+      sender: "user",
+      time: new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }),
+    };
+
+    setMessages((prev) => [...prev, userMessage]);
+    const query = inputValue;
+    setInputValue("");
+    setIsTyping(true);
+
+    try {
+      // ✅ Send message to Django backend
+      const response = await axios.post("http://localhost:8000/api/chat/", { query });
+
+      const botMessage = {
+        id: Date.now(),
+        text: response.data.response || "I received your message.",
+        sender: "bot",
         time: new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }),
       };
-      setMessages([...messages, newMessage]);
-      setInputValue("");
 
-      // Simulate bot response
-      setTimeout(() => {
-        const botResponse = {
-          id: messages.length + 2,
-          text: "Thanks for your message! 😊 I'm here to help.",
-          sender: "bot",
-          time: new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }),
-        };
-        setMessages((prev) => [...prev, botResponse]);
-      }, 1000);
+      setMessages((prev) => [...prev, botMessage]);
+    } catch (error) {
+      console.error("Chat error:", error);
+
+      const errorMessage = {
+        id: Date.now(),
+        text:
+          error.response?.data?.error ||
+          "⚠️ Oops! Something went wrong. Please try again later.",
+        sender: "bot",
+        time: new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }),
+      };
+
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
+      setIsTyping(false);
     }
   };
 
@@ -75,6 +98,15 @@ export default function FloatingChatButton() {
               </div>
             </div>
           ))}
+
+          {/* Show typing indicator while waiting for backend */}
+          {isTyping && (
+            <div className="chat-message bot">
+              <div className="message-bubble typing">
+                <p>Bot is typing...</p>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="chat-input">

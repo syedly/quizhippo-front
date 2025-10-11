@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Sidebar from "../components/Sidebar";
+import FloatingChatButton from "../components/FloatingChatButton";
 
 export default function CreateQuiz() {
   const [quizType, setQuizType] = useState("mix");
@@ -437,6 +438,7 @@ export default function CreateQuiz() {
           </div>
         </div>
       </div>
+      <FloatingChatButton />
     </div>
   );
 }

@@ -70,38 +70,36 @@ export default function Sidebar() {
   const [activeNav, setActiveNav] = useState('home');
   const navigate = useNavigate();
 
-  // ✅ Logout Handler
   const handleLogout = async () => {
     const refreshToken = localStorage.getItem('refresh_token');
+    const accessToken = localStorage.getItem('access_token');
 
     try {
-      // Send logout request to Django API
-      await axios.post('http://localhost:8000/api/logout-view/', 
-        { refresh_token: refreshToken },
-        {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-            'Content-Type': 'application/json'
+      if (refreshToken && accessToken) {
+        await axios.post(
+          'http://localhost:8000/api/logout-view/',
+          { refresh: refreshToken },
+          {
+            headers: {
+              'Authorization': `Bearer ${accessToken}`,
+              'Content-Type': 'application/json',
+            },
           }
-        }
-      );
-
-      // Clear stored tokens
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
-
-      // Redirect to login page
-      navigate('/login');
+        );
+      }
     } catch (error) {
-      console.error('Logout error:', error.response ? error.response.data : error.message);
-      alert('Error logging out. You will be redirected to login.');
-
-      // Still clear tokens and redirect (safety)
+      console.error(
+        'Logout error:',
+        error.response?.data || error.message || error
+      );
+    } finally {
+      // ✅ Always clear tokens and redirect, even if API failed
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
       navigate('/login');
     }
   };
+
 
   return (
     <div style={styles.sidebar}>

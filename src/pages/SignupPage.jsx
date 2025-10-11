@@ -1,103 +1,370 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from 'react';
+import '../css/login.css'; // Reuse the same CSS file, classes adapted where needed
 
-export default function SignupPage() {
-  const navigate = useNavigate();
+const SignupPage = () => {
   const [formData, setFormData] = useState({
-    username: "",
-    email: "",
-    password: "",
+    username: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    agreeToTerms: false
   });
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [errors, setErrors] = useState({});
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-
-    try {
-      const response = await fetch("http://127.0.0.1:8000/api/register/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setError(data.error || "Registration failed");
-      } else {
-        // Save tokens and redirect
-        localStorage.setItem("access", data.tokens.access);
-        localStorage.setItem("refresh", data.tokens.refresh);
-        navigate("/main");
-      }
-    } catch (err) {
-      setError("Something went wrong. Please try again.");
-    } finally {
-      setLoading(false);
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+    // Clear error on change
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
     }
   };
 
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.username.trim()) {
+      newErrors.username = 'Username is required';
+    } else if (formData.username.length < 3) {
+      newErrors.username = 'Username must be at least 3 characters';
+    }
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Email is invalid';
+    }
+    if (!formData.password) {
+      newErrors.password = 'Password is required';
+    } else if (formData.password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters';
+    }
+    if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match';
+    }
+    if (!formData.agreeToTerms) {
+      newErrors.agreeToTerms = 'You must agree to the terms';
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!validateForm()) return;
+    setIsLoading(true);
+    console.log('Signup data:', formData);
+    
+    // Simulate signup
+    setTimeout(() => {
+      setIsLoading(false);
+      window.location.href = '/dashboard';
+    }, 2000);
+  };
+
+  const handleGoogleSignup = () => {
+    console.log('Google signup clicked');
+  };
+
+  const handleGithubSignup = () => {
+    console.log('Github signup clicked');
+  };
+
+  const handleNavigate = (path) => {
+    window.location.href = path;
+  };
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900">
-      <div className="bg-white dark:bg-gray-800 shadow-lg rounded-2xl p-10 w-80">
-        <h2 className="text-2xl font-bold mb-6 text-center text-gray-800 dark:text-white">
-          Sign Up
-        </h2>
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          <input
-            type="text"
-            name="username"
-            placeholder="Username"
-            value={formData.username}
-            onChange={handleChange}
-            className="w-full p-3 rounded-md border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white"
-            required
-          />
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={handleChange}
-            className="w-full p-3 rounded-md border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white"
-          />
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-            className="w-full p-3 rounded-md border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white"
-            required
-          />
-          {error && (
-            <p className="text-red-500 text-sm text-center">{error}</p>
-          )}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium transition"
-          >
-            {loading ? "Registering..." : "Sign Up"}
-          </button>
-        </form>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-4 text-center">
-          Already have an account?{" "}
-          <a
-            href="/login"
-            className="text-blue-600 hover:underline dark:text-blue-400"
-          >
-            Login
-          </a>
-        </p>
+    <div className="login-page"> {/* Reuse login-page class for consistency */}
+      {/* Background Elements */}
+      <div className="login-background">
+        <div className="bg-gradient gradient-1"></div>
+        <div className="bg-gradient gradient-2"></div>
+        <div className="bg-gradient gradient-3"></div>
+        <div className="floating-shapes-login">
+          <div className="shape-login shape-1-login"></div>
+          <div className="shape-login shape-2-login"></div>
+          <div className="shape-login shape-3-login"></div>
+        </div>
+      </div>
+
+      {/* Logo and Back Button */}
+      <div className="login-header">
+        <button className="btn-back" onClick={() => handleNavigate('/')}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <line x1="19" y1="12" x2="5" y2="12"/>
+            <polyline points="12 19 5 12 12 5"/>
+          </svg>
+          Back to Home
+        </button>
+        <div className="login-logo">
+          <div className="logo-icon-login">
+            <svg width="36" height="36" viewBox="0 0 60 60" fill="none">
+              <path d="M30 0L35 20L40 10L42 25L50 15L48 30L60 25L52 35L60 40L50 42L55 50L45 48L47 58L37 52L35 60L30 50L25 60L23 52L13 58L15 48L5 50L10 42L0 40L8 35L0 30L12 28L10 20L18 22L15 12L25 18L23 8L30 15V0Z" fill="#6366F1"/>
+            </svg>
+          </div>
+          <span className="logo-text-login">Quiz Hippo</span>
+        </div>
+      </div>
+
+      {/* Signup Container */}
+      <div className="login-container">
+        <div className="login-card">
+          {/* Left Side - Form */}
+          <div className="login-form-section">
+            <div className="login-form-header">
+              <h1 className="login-title">Create Account</h1> {/* Changed title */}
+              <p className="login-subtitle">Join us and start your learning adventure today</p> {/* Adapted subtitle */}
+            </div>
+
+            <div className="login-form">
+              {/* Username Input */}
+              <div className="form-group-login">
+                <label htmlFor="username" className="form-label-login">Username</label>
+                <div className="input-wrapper">
+                  <svg className="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="7" r="4"/>
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  </svg>
+                  <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    className={`form-input-login ${errors.username ? 'error' : ''}`}
+                    placeholder="Choose a username"
+                    value={formData.username}
+                    onChange={handleInputChange}
+                    required
+                  />
+                  {errors.username && <span className="error-message">{errors.username}</span>}
+                </div>
+              </div>
+
+              {/* Email Input */}
+              <div className="form-group-login">
+                <label htmlFor="email" className="form-label-login">Email Address</label>
+                <div className="input-wrapper">
+                  <svg className="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                    <polyline points="22,6 12,13 2,6"/>
+                  </svg>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    className={`form-input-login ${errors.email ? 'error' : ''}`}
+                    placeholder="your@email.com"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    required
+                  />
+                  {errors.email && <span className="error-message">{errors.email}</span>}
+                </div>
+              </div>
+
+              {/* Password Input */}
+              <div className="form-group-login">
+                <label htmlFor="password" className="form-label-login">Password</label>
+                <div className="input-wrapper">
+                  <svg className="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                  </svg>
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    id="password"
+                    name="password"
+                    className={`form-input-login ${errors.password ? 'error' : ''}`}
+                    placeholder="Create a password"
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="btn-toggle-password"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                        <line x1="1" y1="1" x2="23" y2="23"/>
+                      </svg>
+                    ) : (
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                      </svg>
+                    )}
+                  </button>
+                  {errors.password && <span className="error-message">{errors.password}</span>}
+                </div>
+              </div>
+
+              {/* Confirm Password Input */}
+              <div className="form-group-login">
+                <label htmlFor="confirmPassword" className="form-label-login">Confirm Password</label>
+                <div className="input-wrapper">
+                  <svg className="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                  </svg>
+                  <input
+                    type={showConfirmPassword ? "text" : "password"}
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    className={`form-input-login ${errors.confirmPassword ? 'error' : ''}`}
+                    placeholder="Confirm your password"
+                    value={formData.confirmPassword}
+                    onChange={handleInputChange}
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="btn-toggle-password"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  >
+                    {showConfirmPassword ? (
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                        <line x1="1" y1="1" x2="23" y2="23"/>
+                      </svg>
+                    ) : (
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                      </svg>
+                    )}
+                  </button>
+                  {errors.confirmPassword && <span className="error-message">{errors.confirmPassword}</span>}
+                </div>
+              </div>
+
+              {/* Terms Checkbox */}
+              <div className="form-options">
+                <label className="checkbox-label-login">
+                  <input
+                    type="checkbox"
+                    name="agreeToTerms"
+                    checked={formData.agreeToTerms}
+                    onChange={handleInputChange}
+                  />
+                  <span className="checkbox-custom-login"></span>
+                  <span className="checkbox-text">I agree to the Terms of Service and Privacy Policy</span>
+                </label>
+                {errors.agreeToTerms && <span className="error-message">{errors.agreeToTerms}</span>}
+              </div>
+
+              {/* Submit Button */}
+              <button type="button" onClick={handleSubmit} className="btn-login-submit" disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <span className="loading-spinner"></span>
+                    Creating Account...
+                  </>
+                ) : (
+                  <>
+                    Sign Up
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <line x1="5" y1="12" x2="19" y2="12"/>
+                      <polyline points="12 5 19 12 12 19"/>
+                    </svg>
+                  </>
+                )}
+              </button>
+            </div>
+
+            {/* Divider */}
+            <div className="divider">
+              <span className="divider-line"></span>
+              <span className="divider-text">Or sign up with</span>
+              <span className="divider-line"></span>
+            </div>
+
+            {/* Social Signup */}
+            <div className="social-login">
+              <button className="btn-social google" onClick={handleGoogleSignup}>
+                <svg width="20" height="20" viewBox="0 0 24 24">
+                  <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                  <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                  <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                  <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+                Google
+              </button>
+              <button className="btn-social github" onClick={handleGithubSignup}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                </svg>
+                GitHub
+              </button>
+            </div>
+
+            {/* Login Link */}
+            <div className="signup-link">
+              <span>Already have an account?</span>
+              <a href="/login" className="link-signup">Sign in here</a>
+            </div>
+          </div>
+
+          {/* Right Side - Visual */}
+          <div className="login-visual-section">
+            <div className="visual-content">
+              <div className="visual-icon">
+                <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                  <path d="M2 17l10 5 10-5"/>
+                  <path d="M2 12l10 5 10-5"/>
+                </svg>
+              </div>
+              <h2 className="visual-title">Join the Community</h2>
+              <p className="visual-description">Become part of thousands of learners mastering new skills with Quiz Hippo</p>
+              
+              <div className="visual-stats">
+                <div className="visual-stat">
+                  <div className="stat-value-login">10K+</div>
+                  <div className="stat-label-login">Active Users</div>
+                </div>
+                <div className="visual-stat">
+                  <div className="stat-value-login">50K+</div>
+                  <div className="stat-label-login">Quizzes</div>
+                </div>
+                <div className="visual-stat">
+                  <div className="stat-value-login">1M+</div>
+                  <div className="stat-label-login">Questions</div>
+                </div>
+              </div>
+
+              <div className="visual-features">
+                <div className="visual-feature">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  <span>Create custom quizzes</span>
+                </div>
+                <div className="visual-feature">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  <span>Join learning communities</span>
+                </div>
+                <div className="visual-feature">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  <span>Track your progress</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
-}
+};
+
+export default SignupPage;

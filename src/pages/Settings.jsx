@@ -1,27 +1,88 @@
-import React, { useState } from 'react';
-import Sidebar from '../components/Sidebar';
-import FloatingChatButton from '../components/FloatingChatButton';
-import '../css/Settings.css';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import Sidebar from "../components/Sidebar";
+import FloatingChatButton from "../components/FloatingChatButton";
+import "../css/Settings.css";
 
 const Settings = () => {
-  const [username, setUsername] = useState('admin');
-  const [email, setEmail] = useState('admin@admin.com');
+  const [username, setUsername] = useState("admin");
+  const [email, setEmail] = useState("admin@admin.com");
   const [lightMode, setLightMode] = useState(false);
   const [emailNotifications, setEmailNotifications] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleSaveChanges = () => alert('Profile changes saved!');
-  const handleSavePreferences = () => alert('Preferences saved!');
-  const handleChangePicture = () => alert('Change picture clicked');
-  const handleChangePassword = () => alert('Change password clicked');
-  const handleCloseAccount = () => alert('Close account clicked');
+  // ✅ Fetch current user preferences when the component loads
+  useEffect(() => {
+    const fetchPreferences = async () => {
+      try {
+        const token = localStorage.getItem("access_token");
+        if (!token) return;
+
+        const response = await axios.get(
+          "http://localhost:8000/api/preferences/update/",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        // Set saved preferences
+        setLightMode(response.data.light_mode);
+      } catch (error) {
+        console.error("Error fetching preferences:", error);
+      }
+    };
+
+    fetchPreferences();
+  }, []);
+
+  // ✅ Update preferences (POST request)
+  const handleSavePreferences = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        alert("You must be logged in to save preferences.");
+        setLoading(false);
+        return;
+      }
+
+      const response = await axios.post(
+        "http://localhost:8000/api/preferences/update/",
+        { light_mode: lightMode },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      alert(`✅ ${response.data.message}`);
+    } catch (error) {
+      console.error("Error saving preferences:", error.response?.data || error.message);
+      if (error.response?.status === 401) {
+        alert("❌ Session expired. Please log in again.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSaveChanges = () => alert("Profile changes saved!");
+  const handleChangePicture = () => alert("Change picture clicked");
+  const handleChangePassword = () => alert("Change password clicked");
+  const handleCloseAccount = () => alert("Close account clicked");
 
   return (
-    <div className="settings-page">
+    <div className={`settings-page ${lightMode ? "light-theme" : "dark-theme"}`}>
       <Sidebar />
       <div className="settings-content">
         <h1 className="settings-title">Settings</h1>
 
-        {/* PROFILE */}
+        {/* PROFILE SECTION */}
         <section className="settings-section">
           <div className="section-container">
             <h2 className="section-title">Profile</h2>
@@ -69,7 +130,7 @@ const Settings = () => {
           </div>
         </section>
 
-        {/* ACCOUNT */}
+        {/* ACCOUNT SECTION */}
         <section className="settings-section">
           <div className="section-container">
             <h2 className="section-title">Account</h2>
@@ -91,7 +152,7 @@ const Settings = () => {
           </div>
         </section>
 
-        {/* PREFERENCES */}
+        {/* PREFERENCES SECTION */}
         <section className="settings-section">
           <div className="section-container">
             <h2 className="section-title">Preferences</h2>
@@ -120,8 +181,12 @@ const Settings = () => {
                 </label>
               </div>
 
-              <button className="btn-save-preferences" onClick={handleSavePreferences}>
-                Save Preferences
+              <button
+                className="btn-save-preferences"
+                onClick={handleSavePreferences}
+                disabled={loading}
+              >
+                {loading ? "Saving..." : "Save Preferences"}
               </button>
             </div>
           </div>

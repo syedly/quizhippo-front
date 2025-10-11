@@ -1,0 +1,315 @@
+/* ==============================
+   SETTINGS PAGE BASE LAYOUT
+============================== */
+.settings-page {
+  display: flex;
+  min-height: 100vh;
+  width: 100vw;
+  position: relative;
+  background: #020617; /* main background */
+  color: #ffffff;
+  overflow-x: hidden;
+}
+
+.settings-content {
+  flex: 1;
+  margin-left: 256px; /* Sidebar width */
+  padding: 40px 60px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* centers all section cards horizontally */
+}
+
+.settings-title {
+  font-size: 32px;
+  font-weight: 600;
+  margin-bottom: 40px;
+  color: #ffffff;
+  text-align: center;
+  margin-left: 70px;
+}
+
+/* ==============================
+   SECTION CONTAINERS
+============================== */
+.settings-section {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 40px;
+}
+
+.section-container {
+  width: 100%;
+  max-width: 1000px;
+  background: rgba(42, 42, 64, 0.6);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  border-radius: 16px;
+  padding: 30px 40px;
+}
+
+.section-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 30px;
+  color: #ffffff;
+  border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+  padding-bottom: 10px;
+}
+
+/* ==============================
+   PROFILE SECTION
+============================== */
+.profile-container {
+  display: flex;
+  gap: 150px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  margin-left: 100px;
+}
+
+.profile-image-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.profile-image {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: #2a2a40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.btn-change-picture {
+  background: #6366F1;
+  color: #ffffff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+.btn-change-picture:hover {
+  background: #5558E3;
+}
+
+.profile-form {
+  flex: 1;
+  max-width: 500px;
+}
+
+.form-group {
+  margin-bottom: 24px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: #e0e0e0;
+}
+
+.form-input {
+  width: 100%;
+  padding: 12px 16px;
+  background: rgba(42, 42, 64, 0.5);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  border-radius: 6px;
+  color: #ffffff;
+  font-size: 14px;
+  transition: border-color 0.3s ease, background 0.3s ease;
+}
+.form-input:focus {
+  outline: none;
+  border-color: #6366F1;
+  background: rgba(42, 42, 64, 0.7);
+}
+
+.btn-save-changes {
+  background: #6366F1;
+  color: #ffffff;
+  border: none;
+  padding: 12px 32px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  margin-left: 345px;
+}
+.btn-save-changes:hover {
+  background: #5558E3;
+}
+
+/* ==============================
+   ACCOUNT SECTION
+============================== */
+.account-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.account-btn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: rgba(42, 42, 64, 0.5);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+.account-btn:hover {
+  background: rgba(42, 42, 64, 0.8);
+  border-color: #6366F1;
+}
+
+.account-btn svg {
+  flex-shrink: 0;
+}
+
+.btn-danger {
+  border-color: rgba(239, 68, 68, 0.5);
+  color: #EF4444;
+}
+.btn-danger:hover {
+  border-color: #EF4444;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* ==============================
+   PREFERENCES SECTION
+============================== */
+.preferences-container {
+  max-width: 1000px;
+}
+
+.preference-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.preference-item:last-of-type {
+  margin-bottom: 30px;
+}
+
+.preference-item span {
+  font-size: 15px;
+  font-weight: 400;
+  color: #ffffff;
+}
+
+/* Toggle Switch */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 24px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #4a4a5e;
+  transition: 0.3s;
+  border-radius: 24px;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.3s;
+  border-radius: 50%;
+}
+
+.toggle-switch input:checked + .toggle-slider {
+  background-color: #6366F1;
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+  transform: translateX(24px);
+}
+
+.btn-save-preferences {
+  background: #6366F1;
+  color: #ffffff;
+  border: none;
+  padding: 12px 32px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+.btn-save-preferences:hover {
+  background: #5558E3;
+}
+
+/* ==============================
+   RESPONSIVE DESIGN
+============================== */
+@media (max-width: 1024px) {
+  .settings-content {
+    margin-left: 256px;
+    padding: 30px 40px;
+  }
+
+  .profile-container {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 30px;
+  }
+}
+
+@media (max-width: 768px) {
+  .settings-content {
+    margin-left: 0;
+    padding: 20px;
+  }
+
+  .section-container {
+    padding: 20px;
+  }
+
+  .settings-title {
+    font-size: 26px;
+  }
+
+  .section-title {
+    font-size: 20px;
+  }
+}

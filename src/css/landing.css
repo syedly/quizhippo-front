@@ -8,7 +8,7 @@
 }
 
 .landing-page {
-  width: 100%;
+  width: 108%;
   min-height: 100vh;
   background: #020617;
   color: #ffffff;
@@ -1187,4 +1187,4 @@
 
 .btn-hero-primary:hover {
   transform: translateY(-3px);
-  box-shadow:
+  }

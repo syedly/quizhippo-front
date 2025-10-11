@@ -7,6 +7,8 @@ import SignupPage from "./pages/SignupPage";
 import Settings from "./pages/Settings";
 import ProfilePage from "./pages/ProfilePage";
 import AllQuizzes from "./pages/AllQuizes";
+import ExplorePage from "./pages/ExplorePage";
+import ServerPage from "./pages/ServerPage";
 
 export default function App() {
   return (
@@ -19,6 +21,8 @@ export default function App() {
         <Route path="/settings" element={<Settings />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/quizzes" element={<AllQuizzes />} />
+        <Route path="/explore" element={<ExplorePage />} />
+        <Route path="/server" element={<ServerPage />} />
       </Routes>
     </Router>
   );

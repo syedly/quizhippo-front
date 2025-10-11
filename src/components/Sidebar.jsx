@@ -157,7 +157,7 @@ export default function Sidebar() {
         </button>
 
         <button
-          onClick={() => setActiveNav('explore')}
+            onClick={() => { setActiveNav('explore'); navigate('/explore')}}
           style={{
             ...styles.navButton,
             ...(activeNav === 'explore' ? styles.navButtonActive : styles.navButtonInactive)
@@ -176,7 +176,7 @@ export default function Sidebar() {
         </button>
 
         <button
-          onClick={() => setActiveNav('server')}
+        onClick={() => { setActiveNav('server'); navigate('/server')}}
           style={{
             ...styles.navButton,
             ...(activeNav === 'server' ? styles.navButtonActive : styles.navButtonInactive)

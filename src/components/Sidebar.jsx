@@ -99,16 +99,16 @@ export default function Sidebar() {
       {/* Navigation */}
       <nav style={styles.nav}>
         <button
-          onClick={() => setActiveNav('home')}
+          onClick={() => { setActiveNav('main'); navigate('/main'); }}
           style={{
             ...styles.navButton,
-            ...(activeNav === 'home' ? styles.navButtonActive : styles.navButtonInactive)
+            ...(activeNav === 'main' ? styles.navButtonActive : styles.navButtonInactive)
           }}
           onMouseEnter={(e) => {
-            if (activeNav !== 'home') e.target.style.backgroundColor = '#1e293b';
+            if (activeNav !== 'main') e.target.style.backgroundColor = '#1e293b';
           }}
           onMouseLeave={(e) => {
-            if (activeNav !== 'home') e.target.style.backgroundColor = 'transparent';
+            if (activeNav !== 'main') e.target.style.backgroundColor = 'transparent';
           }}
         >
           <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -116,6 +116,7 @@ export default function Sidebar() {
           </svg>
           <span>Home</span>
         </button>
+
 
         <button
           onClick={() => setActiveNav('profile')}

@@ -1,0 +1,371 @@
+/* ==============================
+   PROFILE PAGE BASE LAYOUT
+============================== */
+.profile-page {
+  display: flex;
+  min-height: 100vh;
+  width: 100vw;
+  position: relative;
+  background: #020617;
+  color: #ffffff;
+  overflow-x: hidden;
+}
+
+.profile-content {
+  flex: 1;
+  margin-left: 256px;
+  padding: 40px 60px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.profile-section {
+  width: 100%;
+  max-width: 1000px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+/* ==============================
+   PROFILE HEADER
+============================== */
+.profile-header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.profile-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.profile-main-title {
+  font-size: 32px;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0;
+}
+
+.profile-subtitle {
+  font-size: 15px;
+  font-weight: 400;
+  color: #9ca3af;
+  margin: 0;
+}
+
+/* ==============================
+   PROFILE CARD
+============================== */
+.profile-card-section {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.profile-card-container {
+  width: 100%;
+  background: rgba(42, 42, 64, 0.6);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  border-radius: 16px;
+  padding: 30px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.profile-card-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.profile-avatar-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(42, 42, 64, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.profile-username {
+  font-size: 24px;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0;
+}
+
+.profile-email {
+  font-size: 14px;
+  font-weight: 400;
+  color: #9ca3af;
+  margin: 0;
+}
+
+.btn-edit-profile {
+  background: #6366F1;
+  color: #ffffff;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.btn-edit-profile:hover {
+  background: #5558E3;
+}
+
+/* ==============================
+   SECTION HEADING
+============================== */
+.section-heading {
+  font-size: 24px;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0 0 20px 0;
+}
+
+/* ==============================
+   QUIZ STATISTICS
+============================== */
+.stats-section {
+  width: 100%;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.stat-card {
+  background: rgba(42, 42, 64, 0.6);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.stat-label {
+  font-size: 14px;
+  font-weight: 400;
+  color: #9ca3af;
+  margin: 0;
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+/* ==============================
+   YOUR SERVERS
+============================== */
+.servers-section {
+  width: 100%;
+}
+
+.server-card {
+  background: rgba(42, 42, 64, 0.6);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  border-radius: 12px;
+  padding: 24px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.server-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.server-name {
+  font-size: 20px;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0;
+}
+
+.server-description {
+  font-size: 14px;
+  font-weight: 400;
+  color: #9ca3af;
+  margin: 0;
+}
+
+.server-code {
+  font-size: 13px;
+  font-weight: 400;
+  color: #6b7280;
+  margin: 0;
+}
+
+.server-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.btn-server-action {
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-members {
+  background: transparent;
+  color: #6366F1;
+  border: 1px solid #6366F1;
+}
+
+.btn-members:hover {
+  background: rgba(99, 102, 241, 0.1);
+}
+
+.btn-results {
+  background: transparent;
+  color: #10b981;
+  border: 1px solid #10b981;
+}
+
+.btn-results:hover {
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.btn-delete {
+  background: transparent;
+  color: #ef4444;
+  border: 1px solid #ef4444;
+}
+
+.btn-delete:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* ==============================
+   LOGOUT SECTION
+============================== */
+.logout-section {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.btn-logout {
+  background: #ef4444;
+  color: #ffffff;
+  border: none;
+  padding: 12px 40px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.btn-logout:hover {
+  background: #dc2626;
+}
+
+/* ==============================
+   RESPONSIVE DESIGN
+============================== */
+@media (max-width: 1024px) {
+  .profile-content {
+    margin-left: 256px;
+    padding: 30px 40px;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .profile-content {
+    margin-left: 0;
+    padding: 20px;
+  }
+
+  .profile-main-title {
+    font-size: 26px;
+  }
+
+  .section-heading {
+    font-size: 20px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-card-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+
+  .server-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .server-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-card-left {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .server-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .btn-server-action {
+    width: 100%;
+  }
+}

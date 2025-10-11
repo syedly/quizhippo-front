@@ -1,0 +1,345 @@
+/* ==============================
+   ALL QUIZZES PAGE BASE LAYOUT
+============================== */
+.all-quizzes-page {
+  display: flex;
+  min-height: 100vh;
+  width: 100vw;
+  position: relative;
+  background: #020617;
+  color: #ffffff;
+  overflow-x: hidden;
+}
+
+.all-quizzes-content {
+  flex: 1;
+  margin-left: 256px;
+  padding: 40px 60px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.all-quizzes-section {
+  width: 100%;
+  max-width: 1400px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+/* ==============================
+   QUIZ TABLE
+============================== */
+.quiz-table-container {
+  width: 100%;
+  background: rgba(42, 42, 64, 0.6);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  border-radius: 16px;
+  padding: 0;
+  overflow: hidden;
+}
+
+.quiz-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.quiz-table thead {
+  background: rgba(30, 30, 50, 0.8);
+}
+
+.table-header {
+  padding: 20px 30px;
+  text-align: left;
+  font-size: 14px;
+  font-weight: 600;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.table-row {
+  border-bottom: 1px solid rgba(99, 102, 241, 0.15);
+  transition: background 0.2s ease;
+}
+
+.table-row:hover {
+  background: rgba(42, 42, 64, 0.5);
+}
+
+.table-row:last-child {
+  border-bottom: none;
+}
+
+.table-cell {
+  padding: 24px 30px;
+  font-size: 15px;
+  color: #ffffff;
+  vertical-align: middle;
+}
+
+.quiz-title-cell {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+/* ==============================
+   DIFFICULTY BAR
+============================== */
+.difficulty-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.difficulty-bar-wrapper {
+  width: 120px;
+  height: 8px;
+  background: rgba(99, 102, 241, 0.2);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.difficulty-bar-fill {
+  height: 100%;
+  border-radius: 10px;
+  transition: width 0.3s ease;
+}
+
+.difficulty-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: #9ca3af;
+}
+
+/* ==============================
+   CHECKBOX
+============================== */
+.checkbox-container {
+  display: inline-block;
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkbox-container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.checkbox-checkmark {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  background-color: transparent;
+  border: 2px solid rgba(99, 102, 241, 0.5);
+  border-radius: 6px;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.checkbox-container:hover .checkbox-checkmark {
+  border-color: #6366F1;
+}
+
+.checkbox-container input:checked ~ .checkbox-checkmark {
+  background-color: #6366F1;
+  border-color: #6366F1;
+}
+
+.checkbox-checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+  left: 7px;
+  top: 3px;
+  width: 6px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.checkbox-container input:checked ~ .checkbox-checkmark:after {
+  display: block;
+}
+
+/* ==============================
+   ACTIONS
+============================== */
+.actions-container {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.action-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0;
+}
+
+.refresh-btn {
+  color: #6366F1;
+}
+
+.refresh-btn:hover {
+  background: rgba(99, 102, 241, 0.15);
+}
+
+.view-btn {
+  color: #6366F1;
+}
+
+.view-btn:hover {
+  background: rgba(99, 102, 241, 0.15);
+}
+
+.info-btn {
+  color: #6366F1;
+}
+
+.info-btn:hover {
+  background: rgba(99, 102, 241, 0.15);
+}
+
+.share-btn {
+  color: #6366F1;
+}
+
+.share-btn:hover {
+  background: rgba(99, 102, 241, 0.15);
+}
+
+.delete-btn {
+  color: #ef4444;
+}
+
+.delete-btn:hover {
+  background: rgba(239, 68, 68, 0.15);
+}
+
+.play-btn {
+  color: #6366F1;
+}
+
+.play-btn:hover {
+  background: rgba(99, 102, 241, 0.15);
+}
+
+/* ==============================
+   PAGINATION
+============================== */
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 0;
+}
+
+.pagination-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: #9ca3af;
+  background: rgba(42, 42, 64, 0.6);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  padding: 10px 20px;
+  border-radius: 6px;
+}
+
+.btn-next {
+  background: #6366F1;
+  color: #ffffff;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.btn-next:hover:not(:disabled) {
+  background: #5558E3;
+}
+
+.btn-next:disabled {
+  background: rgba(99, 102, 241, 0.5);
+  cursor: not-allowed;
+}
+
+/* ==============================
+   RESPONSIVE DESIGN
+============================== */
+@media (max-width: 1024px) {
+  .all-quizzes-content {
+    margin-left: 256px;
+    padding: 30px 40px;
+  }
+
+  .table-header,
+  .table-cell {
+    padding: 16px 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .all-quizzes-content {
+    margin-left: 0;
+    padding: 20px;
+  }
+
+  .quiz-table-container {
+    overflow-x: auto;
+  }
+
+  .quiz-table {
+    min-width: 800px;
+  }
+
+  .table-header,
+  .table-cell {
+    padding: 12px 16px;
+    font-size: 13px;
+  }
+
+  .actions-container {
+    gap: 8px;
+  }
+
+  .action-btn {
+    width: 32px;
+    height: 32px;
+  }
+
+  .action-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .pagination-container {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .btn-next {
+    width: 100%;
+  }
+}

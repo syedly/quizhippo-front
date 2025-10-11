@@ -6,6 +6,7 @@ import MainPage from "./pages/MainPage";
 import SignupPage from "./pages/SignupPage";
 import Settings from "./pages/Settings";
 import ProfilePage from "./pages/ProfilePage";
+import AllQuizzes from "./pages/AllQuizes";
 
 export default function App() {
   return (
@@ -17,6 +18,7 @@ export default function App() {
         <Route path="/main" element={<MainPage />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/quizzes" element={<AllQuizzes />} />
       </Routes>
     </Router>
   );

@@ -119,7 +119,7 @@ export default function Sidebar() {
 
 
         <button
-          onClick={() => setActiveNav('profile')}
+          onClick={() => { setActiveNav('profile'); navigate('/profile'); }}
           style={{
             ...styles.navButton,
             ...(activeNav === 'profile' ? styles.navButtonActive : styles.navButtonInactive)
@@ -138,7 +138,7 @@ export default function Sidebar() {
         </button>
 
         <button
-          onClick={() => setActiveNav('quizzes')}
+          onClick={() => { setActiveNav('quizzes'); navigate('/quizzes'); }}
           style={{
             ...styles.navButton,
             ...(activeNav === 'quizzes' ? styles.navButtonActive : styles.navButtonInactive)

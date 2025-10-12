@@ -11,6 +11,13 @@ const Settings = () => {
   const [emailNotifications, setEmailNotifications] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  // Password change states
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [passwordErrors, setPasswordErrors] = useState({});
+
   // ✅ Fetch current user preferences when the component loads
   useEffect(() => {
     const fetchPreferences = async () => {
@@ -73,7 +80,80 @@ const Settings = () => {
 
   const handleSaveChanges = () => alert("Profile changes saved!");
   const handleChangePicture = () => alert("Change picture clicked");
-  const handleChangePassword = () => alert("Change password clicked");
+
+  const handleChangePassword = () => {
+    setShowPasswordModal(true);
+    setOldPassword("");
+    setNewPassword("");
+    setConfirmNewPassword("");
+    setPasswordErrors({});
+  };
+
+  const validatePasswordForm = () => {
+    const errors = {};
+    if (!oldPassword) {
+      errors.oldPassword = "Current password is required";
+    }
+    if (!newPassword) {
+      errors.newPassword = "New password is required";
+    } else if (newPassword.length < 6) {
+      errors.newPassword = "New password must be at least 6 characters";
+    }
+    if (!confirmNewPassword) {
+      errors.confirmNewPassword = "Please confirm your new password";
+    } else if (newPassword !== confirmNewPassword) {
+      errors.confirmNewPassword = "Passwords do not match";
+    }
+    setPasswordErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handlePasswordSubmit = async () => {
+    if (!validatePasswordForm()) return;
+
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        alert("You must be logged in to change your password.");
+        setLoading(false);
+        return;
+      }
+
+      const response = await axios.post(
+        "http://localhost:8000/api/change-pwd/",
+        {
+          password: oldPassword,
+          new_password: newPassword,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      alert(`✅ ${response.data.message}`);
+      setShowPasswordModal(false);
+    } catch (error) {
+      console.error("Error changing password:", error.response?.data || error.message);
+      if (error.response?.status === 401) {
+        alert("❌ Session expired. Please log in again.");
+      } else if (error.response?.status === 400 && error.response.data.error) {
+        setPasswordErrors(prev => ({ ...prev, oldPassword: error.response.data.error }));
+      } else {
+        alert("❌ Failed to change password. Please try again.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleClosePasswordModal = () => {
+    setShowPasswordModal(false);
+    setPasswordErrors({});
+  };
 
   const handleCloseAccount = async () => {
     if (!window.confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
@@ -178,7 +258,7 @@ const Settings = () => {
           <div className="section-container">
             <h2 className="section-title">Account</h2>
             <div className="account-actions">
-              <button className="account-btn" onClick={handleChangePassword}>
+              <button className="account-btn" onClick={handleChangePassword} disabled={loading}>
                 <span>Change Password</span>
                 <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M9 18l6-6-6-6" />
@@ -236,6 +316,62 @@ const Settings = () => {
         </section>
       </div>
       <FloatingChatButton />
+
+      {/* Password Change Modal */}
+      {showPasswordModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h3>Change Password</h3>
+              <button className="modal-close" onClick={handleClosePasswordModal}>
+                ×
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="form-group">
+                <label>Current Password</label>
+                <input
+                  type="password"
+                  value={oldPassword}
+                  onChange={(e) => setOldPassword(e.target.value)}
+                  className={`form-input ${passwordErrors.oldPassword ? "error" : ""}`}
+                  placeholder="Enter your current password"
+                />
+                {passwordErrors.oldPassword && <span className="error-message">{passwordErrors.oldPassword}</span>}
+              </div>
+              <div className="form-group">
+                <label>New Password</label>
+                <input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className={`form-input ${passwordErrors.newPassword ? "error" : ""}`}
+                  placeholder="Enter new password"
+                />
+                {passwordErrors.newPassword && <span className="error-message">{passwordErrors.newPassword}</span>}
+              </div>
+              <div className="form-group">
+                <label>Confirm New Password</label>
+                <input
+                  type="password"
+                  value={confirmNewPassword}
+                  onChange={(e) => setConfirmNewPassword(e.target.value)}
+                  className={`form-input ${passwordErrors.confirmNewPassword ? "error" : ""}`}
+                  placeholder="Confirm new password"
+                />
+                {passwordErrors.confirmNewPassword && <span className="error-message">{passwordErrors.confirmNewPassword}</span>}
+              </div>
+              <button
+                className="btn-save-changes"
+                onClick={handlePasswordSubmit}
+                disabled={loading}
+              >
+                {loading ? "Changing..." : "Change Password"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

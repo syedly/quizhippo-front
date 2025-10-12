@@ -1,55 +1,67 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import Sidebar from "../components/Sidebar";
 import FloatingChatButton from "../components/FloatingChatButton";
 import '../css/explore.css';
 
 const ExplorePage = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedFilter, setSelectedFilter] = useState('Trending');
+  const [selectedFilter, setSelectedFilter] = useState('Explore');
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedDifficulty, setSelectedDifficulty] = useState(null);
+  const [quizzes, setQuizzes] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [difficultyLevels, setDifficultyLevels] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const quizzes = [
-    {
-      id: 1,
-      title: 'Python',
-      category: 'General',
-      difficulty: '',
-      rating: 4.5,
-      totalRatings: 5,
-      userRating: 5
-    },
-    {
-      id: 2,
-      title: 'Django',
-      category: 'Software Development',
-      difficulty: '',
-      rating: 2.0,
-      totalRatings: 5,
-      userRating: 5
-    },
-    {
-      id: 3,
-      title: 'C++',
-      category: 'Programming',
-      difficulty: '',
-      rating: 3.0,
-      totalRatings: 5,
-      userRating: 5
-    },
-    {
-      id: 4,
-      title: 'Hinduism',
-      category: 'Religion',
-      difficulty: '',
-      rating: 3.0,
-      totalRatings: 5,
-      userRating: 5
-    }
-  ];
+  const getDifficultyText = (diff) => {
+    return difficultyLevels[diff] || 'Unknown';
+  };
 
-  const categories = ['Programming', 'Science', 'Mathematics', 'History'];
-  const difficulties = ['Level 1', 'Level 2', 'Level 3', 'Level 4', 'Level 5'];
+  useEffect(() => {
+    const fetchQuizzes = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        let url = 'http://localhost:8000/api/explore/';
+        const params = new URLSearchParams();
+
+        if (selectedCategory) {
+          params.append('category', selectedCategory);
+        }
+        if (selectedDifficulty) {
+          params.append('difficulty', selectedDifficulty);
+        }
+
+        if (selectedFilter === 'Trending') {
+          url = 'http://localhost:8000/api/explore/trending/';
+        }
+
+        if (params.toString()) {
+          url += `?${params.toString()}`;
+        }
+
+        const response = await axios.get(url);
+
+        const apiQuizzes = response.data.results || [];
+        setQuizzes(apiQuizzes);
+        setCategories(response.data.categories || []);
+        setDifficultyLevels(response.data.difficulty_levels || {});
+      } catch (err) {
+        console.error("Error fetching quizzes:", err);
+        setError("Failed to fetch quizzes. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchQuizzes();
+  }, [selectedFilter, selectedCategory, selectedDifficulty]);
+
+  const filteredQuizzes = quizzes.filter(quiz =>
+    quiz.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const handleAddToMyQuiz = (quizId) => {
     console.log('Add to My Quiz:', quizId);
@@ -67,8 +79,8 @@ const ExplorePage = () => {
     setSelectedCategory(category === selectedCategory ? null : category);
   };
 
-  const handleDifficultyClick = (difficulty) => {
-    setSelectedDifficulty(difficulty === selectedDifficulty ? null : difficulty);
+  const handleDifficultyClick = (difficultyKey) => {
+    setSelectedDifficulty(difficultyKey === selectedDifficulty ? null : difficultyKey);
   };
 
   const renderStars = (rating, totalStars = 5, filled = false) => {
@@ -91,6 +103,20 @@ const ExplorePage = () => {
     }
     return stars;
   };
+
+  if (loading) {
+    return (
+      <div className="explore-page">
+        <Sidebar />
+        <FloatingChatButton />
+        <div className="explore-content">
+          <div className="explore-section">
+            <p>Loading quizzes...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="explore-page">
@@ -121,7 +147,7 @@ const ExplorePage = () => {
           <div className="explore-grid">
             {/* Quiz Cards Section */}
             <div className="quiz-cards-section">
-              {quizzes.map((quiz) => (
+              {filteredQuizzes.map((quiz) => (
                 <div key={quiz.id} className="quiz-card">
                   <div className="quiz-card-header">
                     <h3 className="quiz-card-title">{quiz.title}</h3>
@@ -135,19 +161,19 @@ const ExplorePage = () => {
                   
                   <div className="quiz-card-info">
                     <p className="quiz-category">Category: {quiz.category}</p>
-                    <p className="quiz-difficulty">Difficulty:</p>
+                    <p className="quiz-difficulty">Difficulty: {getDifficultyText(quiz.difficulty)}</p>
                   </div>
 
                   <div className="quiz-card-rating">
                     <div className="rating-stars-empty">
-                      {renderStars(quiz.rating, 5, false)}
+                      {renderStars(quiz.avg_rating, 5, false)}
                     </div>
-                    <span className="rating-text">{quiz.rating} / {quiz.totalRatings}</span>
+                    <span className="rating-text">{quiz.avg_rating} ({quiz.avg_rating > 0 ? 'based on ratings' : 'No ratings yet'})</span>
                   </div>
 
                   <div className="quiz-card-actions">
                     <div className="user-rating-stars">
-                      {renderStars(quiz.userRating, 5, true)}
+                      {renderStars(5, 5, true)}
                     </div>
                     <button 
                       className="btn-rate"
@@ -203,13 +229,13 @@ const ExplorePage = () => {
               {/* Difficulty Section */}
               <div className="filter-section">
                 <h3 className="filter-title">Difficulty</h3>
-                {difficulties.map((difficulty) => (
+                {Object.entries(difficultyLevels).map(([key, label]) => (
                   <button
-                    key={difficulty}
-                    className={`filter-btn ${selectedDifficulty === difficulty ? 'active' : ''}`}
-                    onClick={() => handleDifficultyClick(difficulty)}
+                    key={key}
+                    className={`filter-btn ${selectedDifficulty === key ? 'active' : ''}`}
+                    onClick={() => handleDifficultyClick(key)}
                   >
-                    {difficulty}
+                    {label}
                   </button>
                 ))}
               </div>

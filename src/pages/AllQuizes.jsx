@@ -164,8 +164,50 @@ const AllQuizzes = () => {
     console.log('View results for quiz:', quizId);
   };
 
-  const handlePublicToggle = (quizId) => {
-    console.log('Toggle public for quiz:', quizId);
+  const handlePublicToggle = async (quizId) => {
+    const quizIndex = quizzes.findIndex(q => q.id === quizId);
+    if (quizIndex === -1) return;
+
+    const currentQuiz = quizzes[quizIndex];
+    const newIsPublic = !currentQuiz.isPublic;
+
+    // Optimistically update UI
+    setQuizzes(prev => prev.map(q => 
+      q.id === quizId ? { ...q, isPublic: newIsPublic } : q
+    ));
+
+    try {
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        throw new Error("No token");
+      }
+
+      const response = await axios.post(
+        `http://localhost:8000/api/quiz/${quizId}/visibility/`,
+        { is_public: newIsPublic },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      // If success, UI is already updated
+      console.log(response.data.message);
+    } catch (error) {
+      // Revert on error
+      setQuizzes(prev => prev.map(q => 
+        q.id === quizId ? { ...q, isPublic: currentQuiz.isPublic } : q
+      ));
+
+      console.error("Error toggling visibility:", error);
+      if (error.response?.status === 401) {
+        alert("Session expired. Please log in again.");
+      } else {
+        alert("Failed to update visibility. Please try again.");
+      }
+    }
   };
 
   const handleNext = () => {

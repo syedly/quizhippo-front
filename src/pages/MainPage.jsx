@@ -1,443 +1,255 @@
 import { useState } from "react";
+import axios from "axios";
 import Sidebar from "../components/Sidebar";
 import FloatingChatButton from "../components/FloatingChatButton";
+import "../css/main.css";
 
 export default function CreateQuiz() {
-  const [quizType, setQuizType] = useState("mix");
+  const [quizType, setQuizType] = useState("MIX");
   const [numQuestions, setNumQuestions] = useState("5");
-  const [difficulty, setDifficulty] = useState("level1");
-  const [language, setLanguage] = useState("english");
+  const [difficulty, setDifficulty] = useState("1");
+  const [language, setLanguage] = useState("English");
   const [text, setText] = useState("");
+  const [prompt, setPrompt] = useState("");
+  const [url, setUrl] = useState("");
+  const [pdf, setPdf] = useState(null);
   const [activeTab, setActiveTab] = useState("text");
+  const [loading, setLoading] = useState(false);
+  const [quizResponse, setQuizResponse] = useState(null);
 
-  const styles = {
-    container: {
-      backgroundColor: '#020617',
-      padding: '40px 32px',
-      minHeight: '100vh',
-      width: '100vw',
-      boxSizing: 'border-box',
-      display: 'flex'
-    },
-    sidebar: {
-      width: '250px',
-      flexShrink: 0
-    },
-    mainWrapper: {
-      flex: 1,
-      paddingLeft: '32px'
-    },
-    content: {
-      maxWidth: '100%',
-      width: '100%',
-      margin: '0 auto'
-    },
-    title: {
-      fontSize: '36px',
-      fontWeight: 'bold',
-      color: '#ffffff',
-      marginBottom: '40px'
-    },
-    tabsContainer: {
-      marginBottom: '32px'
-    },
-    tabsWrapper: {
-      display: 'flex',
-      gap: '24px',
-      marginBottom: '24px',
-      borderBottom: '1px solid #1e293b',
-      paddingBottom: '0'
-    },
-    tab: {
-      padding: '4px',
-      paddingBottom: '12px',
-      fontWeight: '500',
-      transition: 'color 0.2s',
-      borderBottom: '2px solid transparent',
-      background: 'none',
-      border: 'none',
-      cursor: 'pointer',
-      fontSize: '16px'
-    },
-    tabActive: {
-      color: '#ffffff',
-      borderBottomColor: '#ffffff'
-    },
-    tabInactive: {
-      color: '#64748b',
-      borderBottomColor: 'transparent'
-    },
-    tabContent: {
-      marginTop: '24px'
-    },
-    label: {
-      fontSize: '14px',
-      fontWeight: '500',
-      color: '#ffffff',
-      marginBottom: '12px',
-      display: 'block'
-    },
-    textarea: {
-      width: '100%',
-      minHeight: '200px',
-      backgroundColor: 'rgba(15, 23, 42, 0.5)',
-      border: '1px solid #1e293b',
-      color: '#94a3b8',
-      resize: 'none',
-      borderRadius: '8px',
-      outline: 'none',
-      padding: '12px 16px',
-      fontSize: '14px',
-      fontFamily: 'inherit'
-    },
-    input: {
-      width: '100%',
-      padding: '12px 16px',
-      backgroundColor: 'rgba(15, 23, 42, 0.5)',
-      border: '1px solid #1e293b',
-      borderRadius: '8px',
-      color: '#94a3b8',
-      outline: 'none',
-      fontSize: '14px'
-    },
-    uploadBox: {
-      border: '2px dashed #1e293b',
-      borderRadius: '8px',
-      padding: '64px',
-      textAlign: 'center',
-      backgroundColor: 'rgba(15, 23, 42, 0.3)',
-      transition: 'background-color 0.2s',
-      cursor: 'pointer'
-    },
-    uploadText: {
-      color: '#64748b',
-      fontSize: '14px'
-    },
-    settingsSection: {
-      marginTop: '48px'
-    },
-    settingsTitle: {
-      fontSize: '24px',
-      fontWeight: 'bold',
-      color: '#ffffff',
-      marginBottom: '32px'
-    },
-    grid: {
-      display: 'grid',
-      gridTemplateColumns: 'repeat(2, 1fr)',
-      gap: '32px',
-      width: '100%'
-    },
-    selectWrapper: {
-      position: 'relative'
-    },
-    select: {
-      width: '100%',
-      appearance: 'none',
-      backgroundColor: 'rgba(15, 23, 42, 0.5)',
-      border: '1px solid #1e293b',
-      color: '#ffffff',
-      borderRadius: '8px',
-      height: '48px',
-      padding: '0 16px',
-      outline: 'none',
-      cursor: 'pointer',
-      fontSize: '14px'
-    },
-    selectIcon: {
-      position: 'absolute',
-      right: '12px',
-      top: '50%',
-      transform: 'translateY(-50%)',
-      pointerEvents: 'none'
-    },
-    buttonWrapper: {
-      display: 'flex',
-      justifyContent: 'flex-end',
-      marginTop: '40px'
-    },
-    button: {
-      backgroundColor: '#4f46e5',
-      color: '#ffffff',
-      fontWeight: '500',
-      padding: '12px 32px',
-      borderRadius: '8px',
-      display: 'flex',
-      alignItems: 'center',
-      gap: '8px',
-      fontSize: '16px',
-      border: 'none',
-      cursor: 'pointer',
-      transition: 'background-color 0.2s'
+  const handlePdfUpload = (e) => {
+    const file = e.target.files[0];
+    if (file && file.type === "application/pdf") {
+      setPdf(file);
+    } else {
+      alert("Please upload a valid PDF file.");
+    }
+  };
+
+  const handleSubmit = async () => {
+    try {
+      setLoading(true);
+      setQuizResponse(null);
+
+      const formData = new FormData();
+      formData.append("quiz_type", quizType);
+      formData.append("quiz_count", numQuestions);
+      formData.append("difficulty", difficulty);
+      formData.append("language", language);
+
+      // Handle the active tab
+      if (activeTab === "text" && text) formData.append("input_text", text);
+      if (activeTab === "prompt" && prompt) formData.append("input_prompt", prompt);
+      if (activeTab === "url" && url) formData.append("input_url", url);
+      if (activeTab === "pdf" && pdf) formData.append("input_pdf", pdf);
+
+      // 🔐 Include token if logged in
+      const token = localStorage.getItem("access_token");
+
+      const response = await axios.post(
+        "http://localhost:8000/api/generate-quiz/",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+        }
+      );
+
+      setQuizResponse(response.data);
+      console.log("✅ Quiz Generated:", response.data);
+    } catch (error) {
+      console.error("❌ Error generating quiz:", error.response?.data || error.message);
+      alert(error.response?.data?.message || "Failed to generate quiz");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.sidebar}>
+    <div className="container">
+      <div className="sidebar">
         <Sidebar />
       </div>
-      <div style={styles.mainWrapper}>
-        <div style={styles.content}>
-          <h1 style={styles.title}>
-            Create a Quiz
-          </h1>
 
-          {/* Tabs Section */}
-          <div style={styles.tabsContainer}>
-            <div style={styles.tabsWrapper}>
+      <div className="mainWrapper">
+        <div className="content">
+          <h1 className="title">Create a Quiz</h1>
+
+          {/* ---------- Tabs Section ---------- */}
+          <div className="tabsContainer">
+            <div className="tabsWrapper">
               <button
+                className={`tab ${activeTab === "text" ? "tabActive" : "tabInactive"}`}
                 onClick={() => setActiveTab("text")}
-                style={{
-                  ...styles.tab,
-                  ...(activeTab === "text" ? styles.tabActive : styles.tabInactive)
-                }}
-                onMouseEnter={(e) => {
-                  if (activeTab !== "text") e.target.style.color = '#94a3b8';
-                }}
-                onMouseLeave={(e) => {
-                  if (activeTab !== "text") e.target.style.color = '#64748b';
-                }}
               >
                 Enter Text
               </button>
               <button
+                className={`tab ${activeTab === "prompt" ? "tabActive" : "tabInactive"}`}
                 onClick={() => setActiveTab("prompt")}
-                style={{
-                  ...styles.tab,
-                  ...(activeTab === "prompt" ? styles.tabActive : styles.tabInactive)
-                }}
-                onMouseEnter={(e) => {
-                  if (activeTab !== "prompt") e.target.style.color = '#94a3b8';
-                }}
-                onMouseLeave={(e) => {
-                  if (activeTab !== "prompt") e.target.style.color = '#64748b';
-                }}
               >
                 Enter Prompt
               </button>
               <button
+                className={`tab ${activeTab === "url" ? "tabActive" : "tabInactive"}`}
                 onClick={() => setActiveTab("url")}
-                style={{
-                  ...styles.tab,
-                  ...(activeTab === "url" ? styles.tabActive : styles.tabInactive)
-                }}
-                onMouseEnter={(e) => {
-                  if (activeTab !== "url") e.target.style.color = '#94a3b8';
-                }}
-                onMouseLeave={(e) => {
-                  if (activeTab !== "url") e.target.style.color = '#64748b';
-                }}
               >
                 Provide URL
               </button>
               <button
+                className={`tab ${activeTab === "pdf" ? "tabActive" : "tabInactive"}`}
                 onClick={() => setActiveTab("pdf")}
-                style={{
-                  ...styles.tab,
-                  ...(activeTab === "pdf" ? styles.tabActive : styles.tabInactive)
-                }}
-                onMouseEnter={(e) => {
-                  if (activeTab !== "pdf") e.target.style.color = '#94a3b8';
-                }}
-                onMouseLeave={(e) => {
-                  if (activeTab !== "pdf") e.target.style.color = '#64748b';
-                }}
               >
                 Upload PDF
               </button>
             </div>
 
-            <div style={styles.tabContent}>
+            <div className="tabContent">
               {activeTab === "text" && (
                 <div>
-                  <label style={styles.label}>
-                    Text
-                  </label>
+                  <label className="label">Text</label>
                   <textarea
                     value={text}
                     onChange={(e) => setText(e.target.value)}
-                    style={styles.textarea}
+                    className="textarea"
                     placeholder="Enter your text here..."
-                    onFocus={(e) => e.target.style.borderColor = '#334155'}
-                    onBlur={(e) => e.target.style.borderColor = '#1e293b'}
                   />
                 </div>
               )}
 
               {activeTab === "prompt" && (
                 <div>
-                  <label style={styles.label}>
-                    Prompt
-                  </label>
+                  <label className="label">Prompt</label>
                   <textarea
-                    style={styles.textarea}
-                    placeholder="Enter your text here..."
-                    onFocus={(e) => e.target.style.borderColor = '#334155'}
-                    onBlur={(e) => e.target.style.borderColor = '#1e293b'}
+                    value={prompt}
+                    onChange={(e) => setPrompt(e.target.value)}
+                    className="textarea"
+                    placeholder="Enter your prompt here..."
                   />
                 </div>
               )}
 
               {activeTab === "url" && (
                 <div>
-                  <label style={styles.label}>
-                    URL
-                  </label>
+                  <label className="label">URL</label>
                   <input
                     type="url"
-                    style={styles.input}
+                    value={url}
+                    onChange={(e) => setUrl(e.target.value)}
+                    className="input"
                     placeholder="https://example.com"
-                    onFocus={(e) => e.target.style.borderColor = '#334155'}
-                    onBlur={(e) => e.target.style.borderColor = '#1e293b'}
                   />
                 </div>
               )}
 
               {activeTab === "pdf" && (
                 <div>
-                  <label style={styles.label}>
-                    PDF
-                  </label>
-                  <div 
-                    style={styles.uploadBox}
-                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(15, 23, 42, 0.5)'}
-                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(15, 23, 42, 0.3)'}
-                  >
-                    <p style={styles.uploadText}>
-                      Click to upload or drag and drop PDF
-                    </p>
+                  <label className="label">Upload PDF</label>
+                  <div className="uploadBox">
+                    <input
+                      type="file"
+                      accept="application/pdf"
+                      onChange={handlePdfUpload}
+                      style={{ display: "none" }}
+                      id="pdfUpload"
+                    />
+                    <label htmlFor="pdfUpload" className="uploadText">
+                      {pdf ? pdf.name : "Click to upload or drag and drop PDF"}
+                    </label>
                   </div>
                 </div>
               )}
             </div>
           </div>
 
-          {/* Quiz Settings */}
-          <div style={styles.settingsSection}>
-            <h2 style={styles.settingsTitle}>
-              Quiz Settings
-            </h2>
+          {/* ---------- Quiz Settings ---------- */}
+          <div className="settingsSection">
+            <h2 className="settingsTitle">Quiz Settings</h2>
 
-            <div style={styles.grid}>
-              {/* Quiz Type */}
+            <div className="grid">
               <div>
-                <label style={styles.label}>
-                  Quiz Type
-                </label>
-                <div style={styles.selectWrapper}>
+                <label className="label">Quiz Type</label>
+                <div className="selectWrapper">
                   <select
                     value={quizType}
                     onChange={(e) => setQuizType(e.target.value)}
-                    style={styles.select}
-                    onFocus={(e) => e.target.style.borderColor = '#334155'}
-                    onBlur={(e) => e.target.style.borderColor = '#1e293b'}
+                    className="select"
                   >
-                    <option value="mix">Mix</option>
-                    <option value="multiple">Multiple Choice</option>
-                    <option value="true-false">True/False</option>
+                    <option value="MIX">Mix</option>
+                    <option value="MCQ">Multiple Choice</option>
+                    <option value="TRUE-FALSE">True/False</option>
                   </select>
-                  <div style={styles.selectIcon}>
-                    <svg width="20" height="20" fill="none" stroke="#94a3b8" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </div>
                 </div>
               </div>
 
-              {/* Number of Questions */}
               <div>
-                <label style={styles.label}>
-                  Number of Questions
-                </label>
-                <div style={styles.selectWrapper}>
+                <label className="label">Number of Questions</label>
+                <div className="selectWrapper">
                   <select
                     value={numQuestions}
                     onChange={(e) => setNumQuestions(e.target.value)}
-                    style={styles.select}
-                    onFocus={(e) => e.target.style.borderColor = '#334155'}
-                    onBlur={(e) => e.target.style.borderColor = '#1e293b'}
+                    className="select"
                   >
                     <option value="5">5</option>
                     <option value="10">10</option>
                     <option value="15">15</option>
                     <option value="20">20</option>
                   </select>
-                  <div style={styles.selectIcon}>
-                    <svg width="20" height="20" fill="none" stroke="#94a3b8" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </div>
                 </div>
               </div>
 
-              {/* Difficulty */}
               <div>
-                <label style={styles.label}>
-                  Difficulty
-                </label>
-                <div style={styles.selectWrapper}>
+                <label className="label">Difficulty</label>
+                <div className="selectWrapper">
                   <select
                     value={difficulty}
                     onChange={(e) => setDifficulty(e.target.value)}
-                    style={styles.select}
-                    onFocus={(e) => e.target.style.borderColor = '#334155'}
-                    onBlur={(e) => e.target.style.borderColor = '#1e293b'}
+                    className="select"
                   >
-                    <option value="level1">Level 1</option>
-                    <option value="level2">Level 2</option>
-                    <option value="level3">Level 3</option>
+                    <option value="1">Level 1</option>
+                    <option value="2">Level 2</option>
+                    <option value="3">Level 3</option>
                   </select>
-                  <div style={styles.selectIcon}>
-                    <svg width="20" height="20" fill="none" stroke="#94a3b8" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </div>
                 </div>
               </div>
 
-              {/* Language */}
               <div>
-                <label style={styles.label}>
-                  Language
-                </label>
-                <div style={styles.selectWrapper}>
+                <label className="label">Language</label>
+                <div className="selectWrapper">
                   <select
                     value={language}
                     onChange={(e) => setLanguage(e.target.value)}
-                    style={styles.select}
-                    onFocus={(e) => e.target.style.borderColor = '#334155'}
-                    onBlur={(e) => e.target.style.borderColor = '#1e293b'}
+                    className="select"
                   >
-                    <option value="english">English</option>
-                    <option value="spanish">Spanish</option>
-                    <option value="french">French</option>
+                    <option value="English">English</option>
+                    <option value="Spanish">Spanish</option>
+                    <option value="French">French</option>
                   </select>
-                  <div style={styles.selectIcon}>
-                    <svg width="20" height="20" fill="none" stroke="#94a3b8" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Create Quiz Button */}
-            <div style={styles.buttonWrapper}>
-              <button 
-                style={styles.button}
-                onMouseEnter={(e) => e.target.style.backgroundColor = '#4338ca'}
-                onMouseLeave={(e) => e.target.style.backgroundColor = '#4f46e5'}
-              >
-                Create Quiz
-                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
+            <div className="buttonWrapper">
+              <button className="button" onClick={handleSubmit} disabled={loading}>
+                {loading ? "Generating..." : "Create Quiz"}
               </button>
             </div>
+
+            {/* ---------- Display Response ---------- */}
+            {quizResponse && (
+              <div style={{ marginTop: "40px", color: "white" }}>
+                <h3>✅ Quiz Generated Successfully!</h3>
+                <pre style={{ whiteSpace: "pre-wrap", background: "#1e293b", padding: "16px", borderRadius: "8px" }}>
+                  {JSON.stringify(quizResponse.quiz, null, 2)}
+                </pre>
+              </div>
+            )}
           </div>
         </div>
       </div>
+
       <FloatingChatButton />
     </div>
   );

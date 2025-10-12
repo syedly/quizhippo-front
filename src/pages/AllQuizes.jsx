@@ -1,54 +1,75 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import Sidebar from "../components/Sidebar";
 import FloatingChatButton from "../components/FloatingChatButton";
 import '../css/all-quizes.css';
 
 const AllQuizzes = () => {
   const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = 3;
+  const [quizzes, setQuizzes] = useState([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const pageSize = 5;
 
-  const quizzes = [
-    {
-      id: 1,
-      title: 'Python',
-      difficulty: 'Easy',
-      difficultyLevel: 25,
-      isPublic: true,
-      hasStarted: true
-    },
-    {
-      id: 2,
-      title: 'Django',
-      difficulty: 'Easy',
-      difficultyLevel: 25,
-      isPublic: true,
-      hasStarted: true
-    },
-    {
-      id: 3,
-      title: 'C++',
-      difficulty: 'Easy',
-      difficultyLevel: 25,
-      isPublic: true,
-      hasStarted: true
-    },
-    {
-      id: 4,
-      title: 'Hinduism',
-      difficulty: 'Custom',
-      difficultyLevel: 50,
-      isPublic: true,
-      hasStarted: false
-    },
-    {
-      id: 5,
-      title: 'Islamic History',
-      difficulty: 'Easy',
-      difficultyLevel: 25,
-      isPublic: false,
-      hasStarted: false
+  const getDifficultyText = (diff) => {
+    switch (diff) {
+      case 1: return 'Easy';
+      case 2: return 'Medium';
+      case 3: return 'Hard';
+      case 4: return 'Expert';
+      default: return 'Unknown';
     }
-  ];
+  };
+
+  const getDifficultyLevel = (diff) => diff * 25;
+
+  useEffect(() => {
+    const fetchQuizzes = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem("access_token");
+        if (!token) {
+          setError("You must be logged in to view quizzes.");
+          setLoading(false);
+          return;
+        }
+
+        const response = await axios.get(
+          `http://localhost:8000/api/all-quizzes/?page=${currentPage}&page_size=${pageSize}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        const apiQuizzes = response.data.results || [];
+        const totalCount = response.data.count || 0;
+        setTotalPages(Math.ceil(totalCount / pageSize));
+        setQuizzes(apiQuizzes.map(quiz => ({
+          id: quiz.id,
+          title: quiz.topic || 'Untitled Quiz',
+          difficulty: getDifficultyText(quiz.difficulty),
+          difficultyLevel: getDifficultyLevel(quiz.difficulty),
+          isPublic: quiz.is_public || false,
+          hasStarted: quiz.attempted || false
+        })));
+      } catch (err) {
+        console.error("Error fetching quizzes:", err);
+        setError("Failed to fetch quizzes. Please try again.");
+        if (err.response?.status === 401) {
+          setError("Session expired. Please log in again.");
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchQuizzes();
+  }, [currentPage]);
 
   const handleRefresh = (quizId) => {
     console.log('Refresh quiz:', quizId);
@@ -92,9 +113,37 @@ const AllQuizzes = () => {
 
   const getDifficultyColor = (difficultyLevel) => {
     if (difficultyLevel <= 25) return '#10b981'; // Easy - Green
-    if (difficultyLevel <= 50) return '#f59e0b'; // Custom/Medium - Orange
-    return '#ef4444'; // Hard - Red
+    if (difficultyLevel <= 50) return '#f59e0b'; // Medium - Orange
+    return '#ef4444'; // Hard/Expert - Red
   };
+
+  if (loading) {
+    return (
+      <div className="all-quizzes-page">
+        <Sidebar />
+        <FloatingChatButton />
+        <div className="all-quizzes-content">
+          <div className="all-quizzes-section">
+            <p>Loading quizzes...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="all-quizzes-page">
+        <Sidebar />
+        <FloatingChatButton />
+        <div className="all-quizzes-content">
+          <div className="all-quizzes-section">
+            <p className="error-message">{error}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="all-quizzes-page">
@@ -263,6 +312,14 @@ const AllQuizzes = () => {
 
           {/* Pagination */}
           <div className="pagination-container">
+            <button 
+              className="btn-prev" 
+              onClick={handlePrevious}
+              disabled={currentPage === 1}
+              style={{ display: currentPage === 1 ? 'none' : 'inline-block' }}
+            >
+              Previous
+            </button>
             <span className="pagination-text">Page {currentPage} of {totalPages}</span>
             <button 
               className="btn-next" 

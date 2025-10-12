@@ -74,7 +74,50 @@ const Settings = () => {
   const handleSaveChanges = () => alert("Profile changes saved!");
   const handleChangePicture = () => alert("Change picture clicked");
   const handleChangePassword = () => alert("Change password clicked");
-  const handleCloseAccount = () => alert("Close account clicked");
+
+  const handleCloseAccount = async () => {
+    if (!window.confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const accessToken = localStorage.getItem("access_token");
+      const refreshToken = localStorage.getItem("refresh_token");
+
+      if (!accessToken || !refreshToken) {
+        alert("❌ You must be logged in to delete your account.");
+        setLoading(false);
+        return;
+      }
+
+      const response = await axios.post(
+        "http://localhost:8000/api/delete-account/",
+        { refresh: refreshToken },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      alert(response.data.message);
+
+      // Clear localStorage and redirect to home
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("refresh_token");
+      window.location.href = "/";
+    } catch (error) {
+      setLoading(false);
+      console.error("Error deleting account:", error.response?.data || error.message);
+      if (error.response?.status === 401) {
+        alert("❌ Session expired. Please log in again.");
+      } else {
+        alert("❌ Failed to delete account. Please try again.");
+      }
+    }
+  };
 
   return (
     <div className={`settings-page ${lightMode ? "light-theme" : "dark-theme"}`}>
@@ -142,8 +185,8 @@ const Settings = () => {
                 </svg>
               </button>
 
-              <button className="account-btn btn-danger" onClick={handleCloseAccount}>
-                <span>Close Account</span>
+              <button className="account-btn btn-danger" onClick={handleCloseAccount} disabled={loading}>
+                <span>{loading ? "Deleting..." : "Close Account"}</span>
                 <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M6 19h12V5H6v14zm3-3h6v-2H9v2z" />
                 </svg>

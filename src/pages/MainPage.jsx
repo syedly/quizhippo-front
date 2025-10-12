@@ -180,6 +180,8 @@ export default function CreateQuiz() {
                     <option value="MIX">Mix</option>
                     <option value="MCQ">Multiple Choice</option>
                     <option value="TRUE-FALSE">True/False</option>
+                    <option value="FILL-IN-THE-BLANKS">Fill in the blanks</option>
+                    <option value="SHORT ANSWER">Short Question Answer</option>
                   </select>
                 </div>
               </div>
@@ -211,6 +213,8 @@ export default function CreateQuiz() {
                     <option value="1">Level 1</option>
                     <option value="2">Level 2</option>
                     <option value="3">Level 3</option>
+                    <option value="4">Level 4</option>
+                    <option value="5">Level 5</option>
                   </select>
                 </div>
               </div>

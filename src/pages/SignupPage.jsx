@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import '../css/login.css'; // Reuse the same CSS file, classes adapted where needed
 
 const SignupPage = () => {
@@ -53,17 +54,30 @@ const SignupPage = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
     setIsLoading(true);
-    console.log('Signup data:', formData);
     
-    // Simulate signup
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      const response = await axios.post('http://localhost:8000/api/register/', {
+        username: formData.username,
+        password: formData.password,
+        email: formData.email,
+      });
+      
+      // On success, store tokens if needed (e.g., localStorage.setItem('access_token', response.data.tokens.access);)
+      // For now, just redirect as in simulation
       window.location.href = '/dashboard';
-    }, 2000);
+    } catch (error) {
+      setIsLoading(false);
+      if (error.response && error.response.status === 400 && error.response.data.error) {
+        // Assume username-related error for display
+        setErrors(prev => ({ ...prev, username: error.response.data.error }));
+      } else {
+        console.error('Signup error:', error);
+      }
+    }
   };
 
   const handleGoogleSignup = () => {

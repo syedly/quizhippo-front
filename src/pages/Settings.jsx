@@ -5,11 +5,14 @@ import FloatingChatButton from "../components/FloatingChatButton";
 import "../css/Settings.css";
 
 const Settings = () => {
-  const [username, setUsername] = useState("admin");
-  const [email, setEmail] = useState("admin@admin.com");
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [lightMode, setLightMode] = useState(false);
   const [emailNotifications, setEmailNotifications] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [profileImage, setProfileImage] = useState(null);
+  const [profileImagePreview, setProfileImagePreview] = useState(null);
+  const [profileErrors, setProfileErrors] = useState({});
 
   // Password change states
   const [showPasswordModal, setShowPasswordModal] = useState(false);
@@ -78,8 +81,83 @@ const Settings = () => {
     }
   };
 
-  const handleSaveChanges = () => alert("Profile changes saved!");
-  const handleChangePicture = () => alert("Change picture clicked");
+  const handleSaveChanges = async () => {
+    setLoading(true);
+    setProfileErrors({});
+    
+    try {
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        alert("You must be logged in to save profile changes.");
+        setLoading(false);
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("new_username", username);
+      formData.append("new_email", email);
+      
+      if (profileImage) {
+        formData.append("profile_image", profileImage);
+      }
+
+      const response = await axios.put(
+        "http://localhost:8000/api/update-profile/",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      alert(`✅ ${response.data.message}`);
+      
+      // Update state with new values from response
+      setUsername(response.data.username);
+      setEmail(response.data.email);
+      
+      if (response.data.avatar) {
+        setProfileImagePreview(response.data.avatar);
+      }
+      
+      // Clear the file input
+      setProfileImage(null);
+    } catch (error) {
+      console.error("Error saving profile:", error.response?.data || error.message);
+      if (error.response?.status === 401) {
+        alert("❌ Session expired. Please log in again.");
+      } else if (error.response?.status === 400 && error.response.data.error) {
+        setProfileErrors({ general: error.response.data.error });
+        alert(`❌ ${error.response.data.error}`);
+      } else {
+        alert("❌ Failed to save profile changes. Please try again.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleChangePicture = () => {
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = "image/*";
+    fileInput.onchange = (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        setProfileImage(file);
+        
+        // Create preview
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setProfileImagePreview(reader.result);
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+    fileInput.click();
+  };
 
   const handleChangePassword = () => {
     setShowPasswordModal(true);
@@ -212,12 +290,20 @@ const Settings = () => {
             <div className="profile-container">
               <div className="profile-image-section">
                 <div className="profile-image">
-                  <svg width="60" height="60" viewBox="0 0 24 24" fill="none">
-                    <path
-                      d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"
-                      fill="#6366F1"
+                  {profileImagePreview ? (
+                    <img 
+                      src={profileImagePreview} 
+                      alt="Profile" 
+                      style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }}
                     />
-                  </svg>
+                  ) : (
+                    <svg width="60" height="60" viewBox="0 0 24 24" fill="none">
+                      <path
+                        d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"
+                        fill="#6366F1"
+                      />
+                    </svg>
+                  )}
                 </div>
                 <button className="btn-change-picture" onClick={handleChangePicture}>
                   Change Picture
@@ -245,8 +331,12 @@ const Settings = () => {
                   />
                 </div>
 
-                <button className="btn-save-changes" onClick={handleSaveChanges}>
-                  Save Changes
+                <button 
+                  className="btn-save-changes" 
+                  onClick={handleSaveChanges}
+                  disabled={loading}
+                >
+                  {loading ? "Saving..." : "Save Changes"}
                 </button>
               </div>
             </div>

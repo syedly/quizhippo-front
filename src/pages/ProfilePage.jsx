@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import Sidebar from "../components/Sidebar";
 import FloatingChatButton from "../components/FloatingChatButton";
 import '../css/Profile.css';
@@ -9,6 +10,63 @@ const ProfilePage = () => {
     email: 'admin@admin.com',
     profileImage: null
   });
+  const [quizStats, setQuizStats] = useState({
+    quizzesCreated: 0,
+    quizzesCompleted: 0,
+    bestScore: 0
+  });
+  const [servers, setServers] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      setLoading(true);
+      try {
+        const token = localStorage.getItem("access_token");
+        if (!token) {
+          console.error("No access token found");
+          setLoading(false);
+          return;
+        }
+
+        const response = await axios.get(
+          "http://localhost:8000/api/profile/",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        // Set profile data
+        setProfileData({
+          username: response.data.username,
+          email: response.data.email,
+          profileImage: response.data.avatar || null
+        });
+
+        // Set quiz statistics
+        setQuizStats({
+          quizzesCreated: response.data.quizzes_created,
+          quizzesCompleted: response.data.quizzes_completed,
+          bestScore: response.data.best_score
+        });
+
+        // Set servers
+        setServers(response.data.servers || []);
+      } catch (error) {
+        console.error("Error fetching profile data:", error);
+        if (error.response?.status === 401) {
+          console.error("Session expired. Please log in again.");
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfileData();
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -38,6 +96,20 @@ const ProfilePage = () => {
     // Add your logout logic here
   };
 
+  if (loading) {
+    return (
+      <div className="profile-page">
+        <Sidebar />
+        <FloatingChatButton />
+        <div className="profile-content">
+          <div className="profile-section">
+            <p>Loading profile...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="profile-page">
       <Sidebar />
@@ -58,9 +130,22 @@ const ProfilePage = () => {
               <div className="profile-card-left">
                 <div className="profile-avatar-wrapper">
                   <div className="profile-avatar">
-                    <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
-                      <path d="M30 0L35 20L40 10L42 25L50 15L48 30L60 25L52 35L60 40L50 42L55 50L45 48L47 58L37 52L35 60L30 50L25 60L23 52L13 58L15 48L5 50L10 42L0 40L8 35L0 30L12 28L10 20L18 22L15 12L25 18L23 8L30 15V0Z" fill="#6366F1"/>
-                    </svg>
+                    {profileData.profileImage ? (
+                      <img 
+                        src={profileData.profileImage} 
+                        alt="Profile" 
+                        style={{ 
+                          width: "100%", 
+                          height: "100%", 
+                          objectFit: "cover", 
+                          borderRadius: "50%" 
+                        }}
+                      />
+                    ) : (
+                      <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
+                        <path d="M30 0L35 20L40 10L42 25L50 15L48 30L60 25L52 35L60 40L50 42L55 50L45 48L47 58L37 52L35 60L30 50L25 60L23 52L13 58L15 48L5 50L10 42L0 40L8 35L0 30L12 28L10 20L18 22L15 12L25 18L23 8L30 15V0Z" fill="#6366F1"/>
+                      </svg>
+                    )}
                   </div>
                 </div>
                 <div className="profile-info">
@@ -80,15 +165,15 @@ const ProfilePage = () => {
             <div className="stats-grid">
               <div className="stat-card">
                 <p className="stat-label">Quizzes Created</p>
-                <p className="stat-value">11</p>
+                <p className="stat-value">{quizStats.quizzesCreated}</p>
               </div>
               <div className="stat-card">
                 <p className="stat-label">Quizzes Completed</p>
-                <p className="stat-value">7</p>
+                <p className="stat-value">{quizStats.quizzesCompleted}</p>
               </div>
               <div className="stat-card">
                 <p className="stat-label">Best Score</p>
-                <p className="stat-value">5%</p>
+                <p className="stat-value">{quizStats.bestScore}%</p>
               </div>
             </div>
           </div>
@@ -96,18 +181,24 @@ const ProfilePage = () => {
           {/* Your Servers */}
           <div className="servers-section">
             <h2 className="section-heading">Your Servers</h2>
-            <div className="server-card">
-              <div className="server-info">
-                <h3 className="server-name">test</h3>
-                <p className="server-description">No description provided.</p>
-                <p className="server-code">Code: F6983831</p>
-              </div>
-              <div className="server-actions">
-                <button className="btn-server-action btn-members">Members</button>
-                <button className="btn-server-action btn-results">Results</button>
-                <button className="btn-server-action btn-delete">Delete</button>
-              </div>
-            </div>
+            {servers.length > 0 ? (
+              servers.map((server) => (
+                <div key={server.id} className="server-card">
+                  <div className="server-info">
+                    <h3 className="server-name">{server.name}</h3>
+                    <p className="server-description">No description provided.</p>
+                    <p className="server-code">Created: {new Date(server.created_at).toLocaleDateString()}</p>
+                  </div>
+                  <div className="server-actions">
+                    <button className="btn-server-action btn-members">Members</button>
+                    <button className="btn-server-action btn-results">Results</button>
+                    <button className="btn-server-action btn-delete">Delete</button>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p>No servers found.</p>
+            )}
           </div>
         </div>
       </div>

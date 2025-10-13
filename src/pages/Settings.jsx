@@ -5,8 +5,8 @@ import FloatingChatButton from "../components/FloatingChatButton";
 import "../css/Settings.css";
 
 const Settings = () => {
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("admin");
+  const [email, setEmail] = useState("admin@admin.com");
   const [lightMode, setLightMode] = useState(false);
   const [emailNotifications, setEmailNotifications] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -21,14 +21,15 @@ const Settings = () => {
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [passwordErrors, setPasswordErrors] = useState({});
 
-  // ✅ Fetch current user preferences when the component loads
+  // ✅ Fetch current user preferences and profile data when the component loads
   useEffect(() => {
-    const fetchPreferences = async () => {
+    const fetchUserData = async () => {
       try {
         const token = localStorage.getItem("access_token");
         if (!token) return;
 
-        const response = await axios.get(
+        // Fetch preferences
+        const preferencesResponse = await axios.get(
           "http://localhost:8000/api/preferences/update/",
           {
             headers: {
@@ -39,13 +40,31 @@ const Settings = () => {
         );
 
         // Set saved preferences
-        setLightMode(response.data.light_mode);
+        setLightMode(preferencesResponse.data.light_mode);
+
+        // Fetch profile data (username, email, avatar)
+        const profileResponse = await axios.get(
+          "http://localhost:8000/api/update-profile/",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        // Set profile data
+        setUsername(profileResponse.data.username);
+        setEmail(profileResponse.data.email);
+        if (profileResponse.data.avatar) {
+          setProfileImagePreview(profileResponse.data.avatar);
+        }
       } catch (error) {
-        console.error("Error fetching preferences:", error);
+        console.error("Error fetching user data:", error);
       }
     };
 
-    fetchPreferences();
+    fetchUserData();
   }, []);
 
   // ✅ Update preferences (POST request)

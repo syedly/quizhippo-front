@@ -11,6 +11,10 @@ const AllQuizzes = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [attemptedIds, setAttemptedIds] = useState(new Set());
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [shareUsername, setShareUsername] = useState('');
+  const [selectedQuizId, setSelectedQuizId] = useState(null);
+  const [shareLoading, setShareLoading] = useState(false);
   const pageSize = 5;
 
   const getDifficultyText = (diff) => {
@@ -110,7 +114,59 @@ const AllQuizzes = () => {
   };
 
   const handleShare = (quizId) => {
-    console.log('Share quiz:', quizId);
+    setSelectedQuizId(quizId);
+    setShareUsername('');
+    setShowShareModal(true);
+  };
+
+  const handleCloseShareModal = () => {
+    setShowShareModal(false);
+    setShareUsername('');
+    setSelectedQuizId(null);
+  };
+
+  const handleShareSubmit = async () => {
+    if (!shareUsername.trim()) {
+      alert("Please enter a username.");
+      return;
+    }
+
+    setShareLoading(true);
+    try {
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        alert("You must be logged in to share quizzes.");
+        setShareLoading(false);
+        return;
+      }
+
+      const response = await axios.post(
+        `http://localhost:8000/api/share-quiz/${selectedQuizId}/`,
+        { username: shareUsername.trim() },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      alert(`✅ ${response.data.message}`);
+      handleCloseShareModal();
+    } catch (error) {
+      console.error("Error sharing quiz:", error);
+      if (error.response?.status === 401) {
+        alert("❌ Session expired. Please log in again.");
+      } else if (error.response?.status === 404) {
+        alert(`❌ ${error.response.data.error || "User not found."}`);
+      } else if (error.response?.status === 400) {
+        alert(`❌ ${error.response.data.error || "Invalid request."}`);
+      } else {
+        alert("❌ Failed to share quiz. Please try again.");
+      }
+    } finally {
+      setShareLoading(false);
+    }
   };
 
   const handleDelete = async (quiz) => {
@@ -445,6 +501,40 @@ const AllQuizzes = () => {
           </div>
         </div>
       </div>
+
+      {/* Share Quiz Modal */}
+      {showShareModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h3>Share Quiz</h3>
+              <button className="modal-close" onClick={handleCloseShareModal}>
+                ×
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="form-group">
+                <label>Username</label>
+                <input
+                  type="text"
+                  value={shareUsername}
+                  onChange={(e) => setShareUsername(e.target.value)}
+                  className="form-input"
+                  placeholder="Enter username to share with"
+                  disabled={shareLoading}
+                />
+              </div>
+              <button
+                className="btn-save-changes"
+                onClick={handleShareSubmit}
+                disabled={shareLoading}
+              >
+                {shareLoading ? "Sharing..." : "Share Quiz"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

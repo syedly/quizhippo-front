@@ -14,6 +14,8 @@ const ExplorePage = () => {
   const [difficultyLevels, setDifficultyLevels] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showAllCategories, setShowAllCategories] = useState(false);
+  const [userRatings, setUserRatings] = useState({});
 
   const getDifficultyText = (diff) => {
     return difficultyLevels[diff] || 'Unknown';
@@ -63,12 +65,79 @@ const ExplorePage = () => {
     quiz.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleAddToMyQuiz = (quizId) => {
-    console.log('Add to My Quiz:', quizId);
+  const handleAddToMyQuiz = async (quizId) => {
+    try {
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        alert("You must be logged in to add quizzes.");
+        return;
+      }
+
+      const response = await axios.post(
+        `http://localhost:8000/api/quizzes/${quizId}/save/`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      alert(`✅ ${response.data.message}`);
+    } catch (error) {
+      console.error("Error adding quiz:", error);
+      if (error.response?.status === 401) {
+        alert("❌ Session expired. Please log in again.");
+      } else {
+        alert("❌ Failed to add quiz. Please try again.");
+      }
+    }
   };
 
-  const handleRate = (quizId) => {
-    console.log('Rate quiz:', quizId);
+  const handleRate = async (quizId, rating) => {
+    try {
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        alert("You must be logged in to rate quizzes.");
+        return;
+      }
+
+      const response = await axios.post(
+        `http://localhost:8000/api/quizzes/${quizId}/rate/`,
+        { rating: rating },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      alert(`✅ ${response.data.message}`);
+      
+      // Update user rating in state
+      setUserRatings(prev => ({
+        ...prev,
+        [quizId]: rating
+      }));
+
+      // Refresh quizzes to get updated average rating
+      const url = selectedFilter === 'Trending' 
+        ? 'http://localhost:8000/api/explore/trending/'
+        : 'http://localhost:8000/api/explore/';
+      const refreshResponse = await axios.get(url);
+      setQuizzes(refreshResponse.data.results || []);
+    } catch (error) {
+      console.error("Error rating quiz:", error);
+      if (error.response?.status === 401) {
+        alert("❌ Session expired. Please log in again.");
+      } else if (error.response?.status === 400) {
+        alert(`❌ ${error.response.data.error || "Invalid rating value."}`);
+      } else {
+        alert("❌ Failed to rate quiz. Please try again.");
+      }
+    }
   };
 
   const handleFilterClick = (filter) => {
@@ -83,7 +152,11 @@ const ExplorePage = () => {
     setSelectedDifficulty(difficultyKey === selectedDifficulty ? null : difficultyKey);
   };
 
-  const renderStars = (rating, totalStars = 5, filled = false) => {
+  const handleViewMoreCategories = () => {
+    setShowAllCategories(!showAllCategories);
+  };
+
+  const renderStars = (rating, totalStars = 5, filled = false, interactive = false, quizId = null) => {
     const stars = [];
     for (let i = 1; i <= totalStars; i++) {
       stars.push(
@@ -95,7 +168,9 @@ const ExplorePage = () => {
           fill={filled || i <= rating ? "currentColor" : "none"}
           stroke="currentColor"
           strokeWidth="2"
-          className="star-icon"
+          className={`star-icon ${interactive ? 'interactive-star' : ''}`}
+          onClick={interactive ? () => handleRate(quizId, i) : undefined}
+          style={interactive ? { cursor: 'pointer' } : {}}
         >
           <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
         </svg>
@@ -117,6 +192,8 @@ const ExplorePage = () => {
       </div>
     );
   }
+
+  const displayedCategories = showAllCategories ? categories : categories.slice(0, 5);
 
   return (
     <div className="explore-page">
@@ -173,14 +250,9 @@ const ExplorePage = () => {
 
                   <div className="quiz-card-actions">
                     <div className="user-rating-stars">
-                      {renderStars(5, 5, true)}
+                      {renderStars(userRatings[quiz.id] || 0, 5, true, true, quiz.id)}
                     </div>
-                    <button 
-                      className="btn-rate"
-                      onClick={() => handleRate(quiz.id)}
-                    >
-                      Rate
-                    </button>
+                    <span className="rate-label">Rate this quiz</span>
                   </div>
                 </div>
               ))}
@@ -214,7 +286,7 @@ const ExplorePage = () => {
               {/* Categories Section */}
               <div className="filter-section">
                 <h3 className="filter-title">Categories</h3>
-                {categories.map((category) => (
+                {displayedCategories.map((category) => (
                   <button
                     key={category}
                     className={`filter-btn ${selectedCategory === category ? 'active' : ''}`}
@@ -223,7 +295,14 @@ const ExplorePage = () => {
                     {category}
                   </button>
                 ))}
-                <button className="view-more-btn">View More</button>
+                {categories.length > 5 && (
+                  <button 
+                    className="view-more-btn"
+                    onClick={handleViewMoreCategories}
+                  >
+                    {showAllCategories ? 'View Less' : 'View More'}
+                  </button>
+                )}
               </div>
 
               {/* Difficulty Section */}

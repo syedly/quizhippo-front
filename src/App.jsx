@@ -9,6 +9,7 @@ import ProfilePage from "./pages/ProfilePage";
 import AllQuizzes from "./pages/AllQuizes";
 import ExplorePage from "./pages/ExplorePage";
 import ServerPage from "./pages/ServerPage";
+import ServerDetailPage from "./pages/ServerDetailPage";
 
 export default function App() {
   return (
@@ -23,6 +24,7 @@ export default function App() {
         <Route path="/quizzes" element={<AllQuizzes />} />
         <Route path="/explore" element={<ExplorePage />} />
         <Route path="/server" element={<ServerPage />} />
+        <Route path="/servers/:serverId" element={<ServerDetailPage />} />
       </Routes>
     </Router>
   );

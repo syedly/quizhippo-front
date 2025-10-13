@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Sidebar from "../components/Sidebar";
 import FloatingChatButton from "../components/FloatingChatButton";
@@ -17,6 +18,8 @@ const ServerPage = () => {
   const [loading, setLoading] = useState(true);
   const [createLoading, setCreateLoading] = useState(false);
   const [joinLoading, setJoinLoading] = useState(false);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchServers = async () => {
@@ -215,7 +218,7 @@ const ServerPage = () => {
   };
 
   const handleViewServer = (serverId) => {
-    console.log('Viewing server:', serverId);
+    navigate(`/servers/${serverId}`);
   };
 
   const handleLeaveServer = (serverId) => {

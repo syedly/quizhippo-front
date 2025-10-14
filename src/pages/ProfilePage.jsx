@@ -96,6 +96,53 @@ const ProfilePage = () => {
     // Add your logout logic here
   };
 
+  const handleDeleteServer = async (serverId) => {
+    if (!window.confirm('Are you sure you want to delete this server? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        alert("You must be logged in to delete servers.");
+        return;
+      }
+
+      const response = await axios.delete(
+        `http://localhost:8000/api/servers/${serverId}/delete/`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      alert(`✅ ${response.data.message}`);
+
+      // Refresh profile data to update servers list
+      const profileResponse = await axios.get(
+        "http://localhost:8000/api/profile/",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      setServers(profileResponse.data.servers || []);
+    } catch (error) {
+      console.error("Error deleting server:", error);
+      if (error.response?.status === 401) {
+        alert("❌ Session expired. Please log in again.");
+      } else if (error.response?.status === 403) {
+        alert("❌ You are not allowed to delete this server.");
+      } else {
+        alert("❌ Failed to delete server. Please try again.");
+      }
+    }
+  };
+
   if (loading) {
     return (
       <div className="profile-page">
@@ -186,13 +233,13 @@ const ProfilePage = () => {
                 <div key={server.id} className="server-card">
                   <div className="server-info">
                     <h3 className="server-name">{server.name}</h3>
-                    <p className="server-description">No description provided.</p>
+                    <p className="server-description">{server.description || "no description provided"}</p>
                     <p className="server-code">Created: {new Date(server.created_at).toLocaleDateString()}</p>
                   </div>
                   <div className="server-actions">
                     <button className="btn-server-action btn-members">Members</button>
                     <button className="btn-server-action btn-results">Results</button>
-                    <button className="btn-server-action btn-delete">Delete</button>
+                    <button className="btn-server-action btn-delete" onClick={() => handleDeleteServer(server.id)}>Delete</button>
                   </div>
                 </div>
               ))

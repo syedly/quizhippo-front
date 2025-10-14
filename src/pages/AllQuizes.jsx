@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Sidebar from "../components/Sidebar";
 import FloatingChatButton from "../components/FloatingChatButton";
 import '../css/all-quizes.css';
 
 const AllQuizzes = () => {
+  const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const [quizzes, setQuizzes] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
@@ -110,7 +112,7 @@ const AllQuizzes = () => {
   };
 
   const handleInfo = (quizId) => {
-    console.log('Info quiz:', quizId);
+    navigate(`/quizzes/${quizId}`)
   };
 
   const handleShare = (quizId) => {

@@ -219,7 +219,7 @@ const AllQuizzes = () => {
   };
 
   const handleViewResults = (quizId) => {
-    console.log('View results for quiz:', quizId);
+    navigate(`/quiz-result/${quizId}`);
   };
 
   const handlePublicToggle = async (quizId) => {

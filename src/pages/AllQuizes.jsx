@@ -217,6 +217,7 @@ const AllQuizzes = () => {
 
   const handleRetake = (quizId) => {
     console.log('Retake quiz:', quizId);
+    navigate(`/retake-quiz/${quizId}/submit`);
   };
 
   const handleViewResults = (quizId) => {

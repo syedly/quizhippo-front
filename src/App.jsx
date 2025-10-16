@@ -31,6 +31,7 @@ export default function App() {
         <Route path="/quizzes/:quizId" element={<QuizDetailPage />} />
         <Route path="/quiz-result/:attemptId" element={<QuizResultPage />} />
         <Route path="/quiz/:quizId/submit" element={<QuizTakingPage />} />
+        <Route path="/retake-quiz/:quizId/submit" element={<QuizTakingPage />} />
       </Routes>
     </Router>
   );

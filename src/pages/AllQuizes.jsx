@@ -212,6 +212,7 @@ const AllQuizzes = () => {
 
   const handlePlay = (quizId) => {
     console.log('Play quiz:', quizId);
+    navigate(`/quiz/${quizId}/submit`);
   };
 
   const handleRetake = (quizId) => {

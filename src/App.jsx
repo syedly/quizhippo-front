@@ -12,6 +12,7 @@ import ServerPage from "./pages/ServerPage";
 import ServerDetailPage from "./pages/ServerDetailPage";
 import QuizDetailPage from "./pages/QuizDetailPage";
 import QuizResultPage from "./pages/QuizResultPage";
+import QuizTakingPage from "./pages/QuizTakingPage";
 
 export default function App() {
   return (
@@ -29,6 +30,7 @@ export default function App() {
         <Route path="/servers/:serverId" element={<ServerDetailPage />} />
         <Route path="/quizzes/:quizId" element={<QuizDetailPage />} />
         <Route path="/quiz-result/:attemptId" element={<QuizResultPage />} />
+        <Route path="/quiz/:quizId/submit" element={<QuizTakingPage />} />
       </Routes>
     </Router>
   );

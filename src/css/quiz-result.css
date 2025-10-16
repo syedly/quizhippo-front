@@ -5,6 +5,8 @@
   color: #ffffff;
   min-height: 100vh;
   display: flex;
+  /* flex-direction: column; */
+  margin-left: 250px;
 }
 
 .quiz-result-content {

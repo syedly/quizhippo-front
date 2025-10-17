@@ -27,7 +27,7 @@
   margin-bottom: 40px;
   color: #ffffff;
   text-align: center;
-  margin-left: 70px;
+  width: 100%;
 }
 
 /* ==============================
@@ -63,10 +63,9 @@
 ============================== */
 .profile-container {
   display: flex;
-  gap: 150px;
+  gap: 40px;
   align-items: flex-start;
   flex-wrap: wrap;
-  margin-left: 100px;
 }
 
 .profile-image-section {
@@ -74,6 +73,7 @@
   flex-direction: column;
   align-items: center;
   gap: 20px;
+  flex-shrink: 0;
 }
 
 .profile-image {
@@ -104,7 +104,7 @@
 
 .profile-form {
   flex: 1;
-  max-width: 500px;
+  min-width: 300px;
 }
 
 .form-group {
@@ -145,7 +145,7 @@
   font-weight: 500;
   cursor: pointer;
   transition: background 0.3s ease;
-  margin-left: 345px;
+  align-self: flex-end;
 }
 .btn-save-changes:hover {
   background: #5558E3;
@@ -209,6 +209,7 @@
 
 .preference-item:last-of-type {
   margin-bottom: 30px;
+  border-bottom: none;
 }
 
 .preference-item span {
@@ -273,6 +274,7 @@
   font-weight: 500;
   cursor: pointer;
   transition: background 0.3s ease;
+  align-self: flex-start;
 }
 .btn-save-preferences:hover {
   background: #5558E3;
@@ -293,23 +295,193 @@
     text-align: center;
     gap: 30px;
   }
+
+  .profile-form {
+    min-width: auto;
+    width: 100%;
+  }
+
+  .btn-save-changes {
+    align-self: center;
+  }
+
+  .section-container {
+    padding: 24px 32px;
+  }
 }
 
 @media (max-width: 768px) {
   .settings-content {
     margin-left: 0;
-    padding: 20px;
-  }
-
-  .section-container {
-    padding: 20px;
+    padding: 20px 16px;
+    align-items: center;
   }
 
   .settings-title {
     font-size: 26px;
+    margin-bottom: 32px;
+  }
+
+  .section-container {
+    padding: 20px 16px;
+    margin: 0 8px;
   }
 
   .section-title {
     font-size: 20px;
+    margin-bottom: 24px;
+  }
+
+  .profile-container {
+    gap: 24px;
+  }
+
+  .profile-image {
+    width: 100px;
+    height: 100px;
+  }
+
+  .btn-change-picture {
+    padding: 8px 16px;
+    font-size: 13px;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-input {
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+
+  .btn-save-changes {
+    padding: 10px 24px;
+    font-size: 14px;
+    align-self: center;
+  }
+
+  .account-actions {
+    gap: 12px;
+  }
+
+  .account-btn {
+    padding: 14px 16px;
+    font-size: 14px;
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+
+  .preference-item {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+    padding: 12px 0;
+  }
+
+  .preference-item span {
+    font-size: 14px;
+  }
+
+  .btn-save-preferences {
+    align-self: center;
+    padding: 10px 24px;
+    font-size: 14px;
+  }
+
+  .settings-section {
+    margin-bottom: 32px;
+  }
+}
+
+@media (max-width: 480px) {
+  .settings-content {
+    padding: 16px 12px;
+  }
+
+  .settings-title {
+    font-size: 22px;
+    margin-bottom: 24px;
+  }
+
+  .section-container {
+    padding: 16px 12px;
+    margin: 0 4px;
+  }
+
+  .section-title {
+    font-size: 18px;
+    margin-bottom: 20px;
+  }
+
+  .profile-container {
+    gap: 20px;
+  }
+
+  .profile-image {
+    width: 80px;
+    height: 80px;
+  }
+
+  .btn-change-picture {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
+  .form-group {
+    margin-bottom: 16px;
+  }
+
+  .form-group label {
+    font-size: 13px;
+  }
+
+  .form-input {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+
+  .btn-save-changes {
+    padding: 8px 20px;
+    font-size: 13px;
+    width: 100%;
+  }
+
+  .account-actions {
+    gap: 8px;
+  }
+
+  .account-btn {
+    padding: 12px 12px;
+    font-size: 13px;
+  }
+
+  .account-btn svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .preference-item {
+    padding: 10px 0;
+    gap: 10px;
+  }
+
+  .preference-item span {
+    font-size: 13px;
+  }
+
+  .toggle-switch {
+    align-self: flex-end;
+  }
+
+  .btn-save-preferences {
+    padding: 8px 20px;
+    font-size: 13px;
+    width: 100%;
+  }
+
+  .settings-section {
+    margin-bottom: 24px;
   }
 }

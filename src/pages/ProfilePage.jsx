@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import Sidebar from "../components/Sidebar";
 import FloatingChatButton from "../components/FloatingChatButton";
 import '../css/Profile.css';
@@ -17,6 +18,7 @@ const ProfilePage = () => {
   });
   const [servers, setServers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -88,6 +90,7 @@ const ProfilePage = () => {
 
   const handleEditProfile = () => {
     console.log('Edit profile clicked');
+    navigate('/settings');
     // Add your edit profile logic here
   };
 

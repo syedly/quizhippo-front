@@ -144,10 +144,51 @@ const ServerDetailPage = () => {
     }
   };
 
-  const handleStartQuiz = (quizId) => {
-    console.log('Starting quiz:', quizId);
-    // Navigate to quiz page or start quiz logic
-    // navigate(`/quiz/${quizId}`);
+  const handleStartQuiz = async (quizId) => {
+    try {
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        alert("You must be logged in to start a quiz.");
+        return;
+      }
+
+      const response = await axios.post(
+        `http://localhost:8000/api/quiz/${quizId}/submit/`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      console.log('Quiz attempt started:', response.data);
+
+      // Refresh server details to update attempted status
+      const serverResponse = await axios.get(
+        `http://localhost:8000/api/servers/${serverId}/`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      setServerData(serverResponse.data);
+
+      // Navigate to quiz submit page
+      navigate(`/quiz/${quizId}/submit`);
+    } catch (error) {
+      console.error("Error starting quiz:", error);
+      if (error.response?.status === 401) {
+        alert("❌ Session expired. Please log in again.");
+      } else if (error.response?.status === 400) {
+        alert(`❌ ${error.response.data.error || "Invalid request."}`);
+      } else {
+        alert("❌ Failed to start quiz. Please try again.");
+      }
+    }
   };
 
   const handleBackToServers = () => {
@@ -260,15 +301,15 @@ const ServerDetailPage = () => {
                         )}
                       </div>
                     </div>
-
                     <button 
-                      className="btn-start-quiz"
+                      className={`btn-start-quiz ${quiz.attempted ? 'disabled' : ''}`}
                       onClick={() => handleStartQuiz(quiz.id)}
+                      disabled={quiz.attempted}
                     >
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                         <polygon points="5 3 19 12 5 21 5 3"/>
                       </svg>
-                      {quiz.attempted ? 'Retake Quiz' : 'Start Quiz'}
+                      {quiz.attempted ? 'Attempted' : 'Start Quiz'}
                     </button>
                   </div>
                 ))}

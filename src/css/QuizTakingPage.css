@@ -5,6 +5,7 @@
   font-family: "Poppins", sans-serif;
   position: relative;
   overflow-x: hidden;
+  width: calc(100vw - 0px);
 }
 
 .quiz-page-container::before {

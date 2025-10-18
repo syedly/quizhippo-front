@@ -32,7 +32,7 @@ const ProfilePage = () => {
         }
 
         const response = await axios.get(
-          "http://localhost:8000/api/profile/",
+          "https://quizhippo.pythonanywhere.com/api/profile/",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -112,7 +112,7 @@ const ProfilePage = () => {
       }
 
       const response = await axios.delete(
-        `http://localhost:8000/api/servers/${serverId}/delete/`,
+        `https://quizhippo.pythonanywhere.com/api/servers/${serverId}/delete/`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -125,7 +125,7 @@ const ProfilePage = () => {
 
       // Refresh profile data to update servers list
       const profileResponse = await axios.get(
-        "http://localhost:8000/api/profile/",
+        "https://quizhippo.pythonanywhere.com/api/profile/",
         {
           headers: {
             Authorization: `Bearer ${token}`,

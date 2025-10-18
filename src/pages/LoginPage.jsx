@@ -25,7 +25,7 @@ const LoginPage = () => {
 
     try {
       // Your Django API expects "username" instead of "email"
-      const response = await axios.post('http://localhost:8000/api/login-view/', {
+      const response = await axios.post('https://quizhippo.pythonanywhere.com/api/login-view/', {
         username: formData.username,
         password: formData.password
       });

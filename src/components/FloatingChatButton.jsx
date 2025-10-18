@@ -29,7 +29,7 @@ export default function FloatingChatButton() {
 
     try {
       // ✅ Send message to Django backend
-      const response = await axios.post("http://localhost:8000/api/chat/", { query });
+      const response = await axios.post("https://quizhippo.pythonanywhere.com/api/chat/", { query });
 
       const botMessage = {
         id: Date.now(),

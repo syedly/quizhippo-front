@@ -38,7 +38,7 @@ const AllQuizzes = () => {
         if (!token) return;
 
         const response = await axios.get(
-          "http://localhost:8000/api/quiz/attempts/",
+          "https://quizhippo.pythonanywhere.com/api/quiz/attempts/",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -70,7 +70,7 @@ const AllQuizzes = () => {
         }
 
         const response = await axios.get(
-          `http://localhost:8000/api/all-quizzes/?page=${currentPage}&page_size=${pageSize}`,
+          `https://quizhippo.pythonanywhere.com/api/all-quizzes/?page=${currentPage}&page_size=${pageSize}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -143,7 +143,7 @@ const AllQuizzes = () => {
       }
 
       const response = await axios.post(
-        `http://localhost:8000/api/share-quiz/${selectedQuizId}/`,
+        `https://quizhippo.pythonanywhere.com/api/share-quiz/${selectedQuizId}/`,
         { username: shareUsername.trim() },
         {
           headers: {
@@ -184,7 +184,7 @@ const AllQuizzes = () => {
       }
 
       await axios.delete(
-        `http://localhost:8000/api/quiz/${quiz.id}/delete/`,
+        `https://quizhippo.pythonanywhere.com/api/quiz/${quiz.id}/delete/`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -243,7 +243,7 @@ const AllQuizzes = () => {
       }
 
       const response = await axios.post(
-        `http://localhost:8000/api/quiz/${quizId}/visibility/`,
+        `https://quizhippo.pythonanywhere.com/api/quiz/${quizId}/visibility/`,
         { is_public: newIsPublic },
         {
           headers: {

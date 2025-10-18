@@ -30,7 +30,7 @@ const ServerDetailPage = () => {
 
         // Fetch current user info
         const profileResponse = await axios.get(
-          "http://localhost:8000/api/profile/",
+          "https://quizhippo.pythonanywhere.com/api/profile/",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -42,7 +42,7 @@ const ServerDetailPage = () => {
 
         // Fetch server details
         const response = await axios.get(
-          `http://localhost:8000/api/servers/${serverId}/`,
+          `https://quizhippo.pythonanywhere.com/api/servers/${serverId}/`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -57,7 +57,7 @@ const ServerDetailPage = () => {
         // Fetch user's quizzes if owner
         if (response.data.created_by === profileResponse.data.username) {
           const quizzesResponse = await axios.get(
-            "http://localhost:8000/api/all-quizzes/?page=1&page_size=100",
+            "https://quizhippo.pythonanywhere.com/api/all-quizzes/?page=1&page_size=100",
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -102,7 +102,7 @@ const ServerDetailPage = () => {
       }
 
       const response = await axios.post(
-        `http://localhost:8000/api/servers/${serverId}/add-quiz/`,
+        `https://quizhippo.pythonanywhere.com/api/servers/${serverId}/add-quiz/`,
         { quiz_id: selectedQuizId },
         {
           headers: {
@@ -116,7 +116,7 @@ const ServerDetailPage = () => {
 
       // Refresh server details
       const serverResponse = await axios.get(
-        `http://localhost:8000/api/servers/${serverId}/`,
+        `https://quizhippo.pythonanywhere.com/api/servers/${serverId}/`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -153,7 +153,7 @@ const ServerDetailPage = () => {
       }
 
       const response = await axios.post(
-        `http://localhost:8000/api/quiz/${quizId}/submit/`,
+        `https://quizhippo.pythonanywhere.com/api/quiz/${quizId}/submit/`,
         {},
         {
           headers: {
@@ -167,7 +167,7 @@ const ServerDetailPage = () => {
 
       // Refresh server details to update attempted status
       const serverResponse = await axios.get(
-        `http://localhost:8000/api/servers/${serverId}/`,
+        `https://quizhippo.pythonanywhere.com/api/servers/${serverId}/`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

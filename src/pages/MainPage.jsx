@@ -47,7 +47,7 @@ export default function CreateQuiz() {
       const token = localStorage.getItem("access_token");
 
       const response = await axios.post(
-        "http://localhost:8000/api/generate-quiz/",
+        "https://quizhippo.pythonanywhere.com/api/generate-quiz/",
         formData,
         {
           headers: {

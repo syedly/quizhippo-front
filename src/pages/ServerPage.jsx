@@ -32,7 +32,7 @@ const ServerPage = () => {
         }
 
         const response = await axios.get(
-          "http://localhost:8000/api/servers/",
+          "https://quizhippo.pythonanywhere.com/api/servers/",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -45,7 +45,7 @@ const ServerPage = () => {
         
         // Get current user info for ownership check
         const profileResponse = await axios.get(
-          "http://localhost:8000/api/profile/",
+          "https://quizhippo.pythonanywhere.com/api/profile/",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -99,7 +99,7 @@ const ServerPage = () => {
       }
 
       const response = await axios.post(
-        "http://localhost:8000/api/servers/create/",
+        "https://quizhippo.pythonanywhere.com/api/servers/create/",
         {
           name: newServer.name,
           description: newServer.description,
@@ -159,7 +159,7 @@ const ServerPage = () => {
       }
 
       const response = await axios.post(
-        "http://localhost:8000/api/servers/join/",
+        "https://quizhippo.pythonanywhere.com/api/servers/join/",
         { code: serverCode.trim() },
         {
           headers: {
@@ -174,7 +174,7 @@ const ServerPage = () => {
       // Fetch the server details and add to list
       try {
         const detailResponse = await axios.get(
-          `http://localhost:8000/api/servers/${response.data.server_id}/`,
+          `https://quizhippo.pythonanywhere.com/api/servers/${response.data.server_id}/`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

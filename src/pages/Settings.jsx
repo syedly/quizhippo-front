@@ -30,7 +30,7 @@ const Settings = () => {
 
         // Fetch preferences
         const preferencesResponse = await axios.get(
-          "http://localhost:8000/api/preferences/update/",
+          "https://quizhippo.pythonanywhere.com/api/preferences/update/",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -44,7 +44,7 @@ const Settings = () => {
 
         // Fetch profile data (username, email, avatar)
         const profileResponse = await axios.get(
-          "http://localhost:8000/api/update-profile/",
+          "https://quizhippo.pythonanywhere.com/api/update-profile/",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -79,7 +79,7 @@ const Settings = () => {
       }
 
       const response = await axios.post(
-        "http://localhost:8000/api/preferences/update/",
+        "https://quizhippo.pythonanywhere.com/api/preferences/update/",
         { light_mode: lightMode },
         {
           headers: {
@@ -121,7 +121,7 @@ const Settings = () => {
       }
 
       const response = await axios.put(
-        "http://localhost:8000/api/update-profile/",
+        "https://quizhippo.pythonanywhere.com/api/update-profile/",
         formData,
         {
           headers: {
@@ -218,7 +218,7 @@ const Settings = () => {
       }
 
       const response = await axios.post(
-        "http://localhost:8000/api/change-pwd/",
+        "https://quizhippo.pythonanywhere.com/api/change-pwd/",
         {
           password: oldPassword,
           new_password: newPassword,
@@ -269,7 +269,7 @@ const Settings = () => {
       }
 
       const response = await axios.post(
-        "http://localhost:8000/api/delete-account/",
+        "https://quizhippo.pythonanywhere.com/api/delete-account/",
         { refresh: refreshToken },
         {
           headers: {

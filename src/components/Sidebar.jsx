@@ -130,7 +130,7 @@ export default function Sidebar() {
     try {
       if (refreshToken && accessToken) {
         await axios.post(
-          'http://localhost:8000/api/logout-view/',
+          'https://quizhippo.pythonanywhere.com/api/logout-view/',
           { refresh: refreshToken },
           {
             headers: {

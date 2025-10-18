@@ -41,7 +41,7 @@ const QuizTakingPage = () => {
       }
 
       const response = await axios.post(
-        `http://localhost:8000/api/quiz/${quizId}/submit/`,
+        `https://quizhippo.pythonanywhere.com/api/quiz/${quizId}/submit/`,
         { answers: selectedAnswers },
         {
           headers: {
@@ -87,7 +87,7 @@ const QuizTakingPage = () => {
         }
 
         // Changed to GET request for fetching quiz details
-        const response = await axios.get(`http://localhost:8000/api/quiz/${quizId}/submit/`, {
+        const response = await axios.get(`https://quizhippo.pythonanywhere.com/api/quiz/${quizId}/submit/`, {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",

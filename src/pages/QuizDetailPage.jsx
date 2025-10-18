@@ -25,7 +25,7 @@ const QuizDetailPage = () => {
         }
 
         const response = await axios.get(
-          `http://localhost:8000/api/quizzes/${quizId}/`,
+          `https://quizhippo.pythonanywhere.com/api/quizzes/${quizId}/`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

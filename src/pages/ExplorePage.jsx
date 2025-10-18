@@ -26,7 +26,7 @@ const ExplorePage = () => {
       setLoading(true);
       setError(null);
       try {
-        let url = 'http://localhost:8000/api/explore/';
+        let url = 'https://quizhippo.pythonanywhere.com/api/explore/';
         const params = new URLSearchParams();
 
         if (selectedCategory) {
@@ -37,7 +37,7 @@ const ExplorePage = () => {
         }
 
         if (selectedFilter === 'Trending') {
-          url = 'http://localhost:8000/api/explore/trending/';
+          url = 'https://quizhippo.pythonanywhere.com/api/explore/trending/';
         }
 
         if (params.toString()) {
@@ -74,7 +74,7 @@ const ExplorePage = () => {
       }
 
       const response = await axios.post(
-        `http://localhost:8000/api/quizzes/${quizId}/save/`,
+        `https://quizhippo.pythonanywhere.com/api/quizzes/${quizId}/save/`,
         {},
         {
           headers: {
@@ -104,7 +104,7 @@ const ExplorePage = () => {
       }
 
       const response = await axios.post(
-        `http://localhost:8000/api/quizzes/${quizId}/rate/`,
+        `https://quizhippo.pythonanywhere.com/api/quizzes/${quizId}/rate/`,
         { rating: rating },
         {
           headers: {
@@ -124,8 +124,8 @@ const ExplorePage = () => {
 
       // Refresh quizzes to get updated average rating
       const url = selectedFilter === 'Trending' 
-        ? 'http://localhost:8000/api/explore/trending/'
-        : 'http://localhost:8000/api/explore/';
+        ? 'https://quizhippo.pythonanywhere.com/api/explore/trending/'
+        : 'https://quizhippo.pythonanywhere.com/api/explore/';
       const refreshResponse = await axios.get(url);
       setQuizzes(refreshResponse.data.results || []);
     } catch (error) {

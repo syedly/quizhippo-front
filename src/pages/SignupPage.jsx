@@ -60,7 +60,7 @@ const SignupPage = () => {
     setIsLoading(true);
     
     try {
-      const response = await axios.post('http://localhost:8000/api/register/', {
+      const response = await axios.post('https://quizhippo.pythonanywhere.com/api/register/', {
         username: formData.username,
         password: formData.password,
         email: formData.email,

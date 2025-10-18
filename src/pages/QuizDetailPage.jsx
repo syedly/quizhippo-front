@@ -4,6 +4,7 @@ import axios from 'axios';
 import Sidebar from "../components/Sidebar";
 import FloatingChatButton from "../components/FloatingChatButton";
 import '../css/quiz-detail.css';
+import QuizHippoLoader from '../components/QuizHippoLoader';
 
 const QuizDetailPage = () => {
   const { quizId } = useParams();
@@ -74,7 +75,7 @@ const QuizDetailPage = () => {
         <Sidebar />
         <FloatingChatButton />
         <div className="quiz-detail-content">
-          <p>Loading quiz details...</p>
+          <QuizHippoLoader />
         </div>
       </div>
     );

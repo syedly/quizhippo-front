@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 import Sidebar from "../components/Sidebar";
 import FloatingChatButton from "../components/FloatingChatButton";
 import '../css/explore.css';
+import QuizHippoLoader from '../components/QuizHippoLoader';
 
 const ExplorePage = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -53,6 +55,14 @@ const ExplorePage = () => {
       } catch (err) {
         console.error("Error fetching quizzes:", err);
         setError("Failed to fetch quizzes. Please try again.");
+        Swal.fire({
+          icon: "error",
+          title: "Loading Error",
+          text: "Failed to fetch quizzes. Please refresh the page.",
+          background: "#1e1e2e",
+          color: "#ffffff",
+          confirmButtonColor: "#6366F1",
+        });
       } finally {
         setLoading(false);
       }
@@ -65,13 +75,33 @@ const ExplorePage = () => {
     quiz.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleAddToMyQuiz = async (quizId) => {
+  const handleAddToMyQuiz = async (quizId, quizTitle) => {
     try {
       const token = localStorage.getItem("access_token");
       if (!token) {
-        alert("You must be logged in to add quizzes.");
+        Swal.fire({
+          icon: "warning",
+          title: "Authentication Required",
+          text: "You must be logged in to add quizzes.",
+          background: "#1e1e2e",
+          color: "#ffffff",
+          confirmButtonColor: "#6366F1",
+        });
         return;
       }
+
+      // Show loading
+      Swal.fire({
+        title: 'Adding Quiz...',
+        text: 'Please wait',
+        background: "#1e1e2e",
+        color: "#ffffff",
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
 
       const response = await axios.post(
         `https://quizhippo.pythonanywhere.com/api/quizzes/${quizId}/save/`,
@@ -84,22 +114,61 @@ const ExplorePage = () => {
         }
       );
 
-      alert(`✅ ${response.data.message}`);
+      Swal.fire({
+        icon: "success",
+        title: "Quiz Added!",
+        html: `<strong>"${quizTitle}"</strong> has been added to your quizzes.`,
+        background: "#1e1e2e",
+        color: "#ffffff",
+        confirmButtonColor: "#6366F1",
+        timer: 2000,
+        showConfirmButton: false,
+      });
     } catch (error) {
       console.error("Error adding quiz:", error);
       if (error.response?.status === 401) {
-        alert("❌ Session expired. Please log in again.");
+        Swal.fire({
+          icon: "error",
+          title: "Session Expired",
+          text: "Please log in again.",
+          background: "#1e1e2e",
+          color: "#ffffff",
+          confirmButtonColor: "#6366F1",
+        });
+      } else if (error.response?.status === 400) {
+        Swal.fire({
+          icon: "info",
+          title: "Already Added",
+          text: error.response.data.error || "This quiz is already in your collection.",
+          background: "#1e1e2e",
+          color: "#ffffff",
+          confirmButtonColor: "#6366F1",
+        });
       } else {
-        alert("❌ Failed to add quiz. Please try again.");
+        Swal.fire({
+          icon: "error",
+          title: "Failed to Add Quiz",
+          text: "Something went wrong. Please try again.",
+          background: "#1e1e2e",
+          color: "#ffffff",
+          confirmButtonColor: "#6366F1",
+        });
       }
     }
   };
 
-  const handleRate = async (quizId, rating) => {
+  const handleRate = async (quizId, rating, quizTitle) => {
     try {
       const token = localStorage.getItem("access_token");
       if (!token) {
-        alert("You must be logged in to rate quizzes.");
+        Swal.fire({
+          icon: "warning",
+          title: "Authentication Required",
+          text: "You must be logged in to rate quizzes.",
+          background: "#1e1e2e",
+          color: "#ffffff",
+          confirmButtonColor: "#6366F1",
+        });
         return;
       }
 
@@ -114,7 +183,25 @@ const ExplorePage = () => {
         }
       );
 
-      alert(`✅ ${response.data.message}`);
+      // Show success toast
+      const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+        background: "#1e1e2e",
+        color: "#ffffff",
+        didOpen: (toast) => {
+          toast.addEventListener('mouseenter', Swal.stopTimer)
+          toast.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+      });
+
+      Toast.fire({
+        icon: 'success',
+        title: `Rated ${rating} star${rating !== 1 ? 's' : ''}!`
+      });
       
       // Update user rating in state
       setUserRatings(prev => ({
@@ -131,16 +218,48 @@ const ExplorePage = () => {
     } catch (error) {
       console.error("Error rating quiz:", error);
       if (error.response?.status === 401) {
-        alert("❌ Session expired. Please log in again.");
+        Swal.fire({
+          icon: "error",
+          title: "Session Expired",
+          text: "Please log in again.",
+          background: "#1e1e2e",
+          color: "#ffffff",
+          confirmButtonColor: "#6366F1",
+        });
       } else if (error.response?.status === 400) {
-        alert(`❌ ${error.response.data.error || "Invalid rating value."}`);
+        Swal.fire({
+          icon: "error",
+          title: "Invalid Rating",
+          text: error.response.data.error || "Please select a valid rating.",
+          background: "#1e1e2e",
+          color: "#ffffff",
+          confirmButtonColor: "#6366F1",
+        });
       } else {
-        alert("❌ Failed to rate quiz. Please try again.");
+        Swal.fire({
+          icon: "error",
+          title: "Rating Failed",
+          text: "Failed to rate quiz. Please try again.",
+          background: "#1e1e2e",
+          color: "#ffffff",
+          confirmButtonColor: "#6366F1",
+        });
       }
     }
   };
 
   const handleFilterClick = (filter) => {
+    if (filter === 'For You') {
+      Swal.fire({
+        icon: "info",
+        title: "Coming Soon!",
+        text: "Personalized recommendations feature is coming soon.",
+        background: "#1e1e2e",
+        color: "#ffffff",
+        confirmButtonColor: "#6366F1",
+      });
+      return;
+    }
     setSelectedFilter(filter);
   };
 
@@ -156,7 +275,7 @@ const ExplorePage = () => {
     setShowAllCategories(!showAllCategories);
   };
 
-  const renderStars = (rating, totalStars = 5, filled = false, interactive = false, quizId = null) => {
+  const renderStars = (rating, totalStars = 5, filled = false, interactive = false, quizId = null, quizTitle = null) => {
     const stars = [];
     for (let i = 1; i <= totalStars; i++) {
       stars.push(
@@ -169,7 +288,7 @@ const ExplorePage = () => {
           stroke="currentColor"
           strokeWidth="2"
           className={`star-icon ${interactive ? 'interactive-star' : ''}`}
-          onClick={interactive ? () => handleRate(quizId, i) : undefined}
+          onClick={interactive ? () => handleRate(quizId, i, quizTitle) : undefined}
           style={interactive ? { cursor: 'pointer' } : {}}
         >
           <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
@@ -186,7 +305,7 @@ const ExplorePage = () => {
         <FloatingChatButton />
         <div className="explore-content">
           <div className="explore-section">
-            <p>Loading quizzes...</p>
+            <QuizHippoLoader />
           </div>
         </div>
       </div>
@@ -224,38 +343,49 @@ const ExplorePage = () => {
           <div className="explore-grid">
             {/* Quiz Cards Section */}
             <div className="quiz-cards-section">
-              {filteredQuizzes.map((quiz) => (
-                <div key={quiz.id} className="quiz-card">
-                  <div className="quiz-card-header">
-                    <h3 className="quiz-card-title">{quiz.title}</h3>
-                    <button 
-                      className="btn-add-to-quiz"
-                      onClick={() => handleAddToMyQuiz(quiz.id)}
-                    >
-                      Add to My Quiz
-                    </button>
-                  </div>
-                  
-                  <div className="quiz-card-info">
-                    <p className="quiz-category">Category: {quiz.category}</p>
-                    <p className="quiz-difficulty">Difficulty: {getDifficultyText(quiz.difficulty)}</p>
-                  </div>
-
-                  <div className="quiz-card-rating">
-                    <div className="rating-stars-empty">
-                      {renderStars(quiz.avg_rating, 5, false)}
+              {filteredQuizzes.length > 0 ? (
+                filteredQuizzes.map((quiz) => (
+                  <div key={quiz.id} className="quiz-card">
+                    <div className="quiz-card-header">
+                      <h3 className="quiz-card-title">{quiz.title}</h3>
+                      <button 
+                        className="btn-add-to-quiz"
+                        onClick={() => handleAddToMyQuiz(quiz.id, quiz.title)}
+                      >
+                        Add to My Quiz
+                      </button>
                     </div>
-                    <span className="rating-text">{quiz.avg_rating} ({quiz.avg_rating > 0 ? 'based on ratings' : 'No ratings yet'})</span>
-                  </div>
-
-                  <div className="quiz-card-actions">
-                    <div className="user-rating-stars">
-                      {renderStars(userRatings[quiz.id] || 0, 5, true, true, quiz.id)}
+                    
+                    <div className="quiz-card-info">
+                      <p className="quiz-category">Category: {quiz.category}</p>
+                      <p className="quiz-difficulty">Difficulty: {getDifficultyText(quiz.difficulty)}</p>
                     </div>
-                    <span className="rate-label">Rate this quiz</span>
+
+                    <div className="quiz-card-rating">
+                      <div className="rating-stars-empty">
+                        {renderStars(quiz.avg_rating, 5, false)}
+                      </div>
+                      <span className="rating-text">{quiz.avg_rating} ({quiz.avg_rating > 0 ? 'based on ratings' : 'No ratings yet'})</span>
+                    </div>
+
+                    <div className="quiz-card-actions">
+                      <div className="user-rating-stars">
+                        {renderStars(userRatings[quiz.id] || 0, 5, true, true, quiz.id, quiz.title)}
+                      </div>
+                      <span className="rate-label">Rate this quiz</span>
+                    </div>
                   </div>
+                ))
+              ) : (
+                <div className="no-quizzes-message">
+                  <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                  </svg>
+                  <p>No quizzes found. Try adjusting your filters or search query.</p>
                 </div>
-              ))}
+              )}
             </div>
 
             {/* Sidebar Filters */}
@@ -267,19 +397,19 @@ const ExplorePage = () => {
                   className={`filter-btn ${selectedFilter === 'Trending' ? 'active' : ''}`}
                   onClick={() => handleFilterClick('Trending')}
                 >
-                  Trending
+                  🔥 Trending
                 </button>
                 <button
                   className={`filter-btn explore-btn ${selectedFilter === 'Explore' ? 'active' : ''}`}
                   onClick={() => handleFilterClick('Explore')}
                 >
-                  Explore
+                  🌍 Explore
                 </button>
                 <button
                   className={`filter-btn ${selectedFilter === 'For You' ? 'active' : ''}`}
                   onClick={() => handleFilterClick('For You')}
                 >
-                  For You
+                  ⭐ For You
                 </button>
               </div>
 
@@ -300,7 +430,7 @@ const ExplorePage = () => {
                     className="view-more-btn"
                     onClick={handleViewMoreCategories}
                   >
-                    {showAllCategories ? 'View Less' : 'View More'}
+                    {showAllCategories ? '▲ View Less' : '▼ View More'}
                   </button>
                 )}
               </div>
